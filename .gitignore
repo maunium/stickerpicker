@@ -1,0 +1,11 @@
+/.idea
+
+/.venv
+/env
+*.pyc
+__pycache__
+
+*.session
+*.json
+!example-config.json
+*.bak

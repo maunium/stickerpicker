@@ -1,0 +1,64 @@
+/*
+Copyright (c) 2020 Tulir Asokan
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+* {
+    font-family: sans-serif;
+}
+
+html {
+    scrollbar-width: none;
+}
+
+body {
+    margin: 0;
+}
+
+.main:not(.pack-list) {
+    margin: 2rem;
+}
+
+.main.empty {
+    text-align: center;
+}
+
+.stickerpack > .sticker-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.stickerpack > h1 {
+    margin: .75rem;
+}
+
+.sticker {
+    display: flex;
+    padding: 4px;
+    cursor: pointer;
+    position: relative;
+    width: 25vw;
+    height: 25vw;
+    box-sizing: border-box;
+}
+
+.sticker:hover {
+    background-color: #eee;
+}
+
+.sticker > img {
+    display: none;
+    width: 100%;
+    object-fit: contain;
+}
+
+.sticker > img.visible {
+    display: initial;
+}
+
+h1 {
+    font-size: 1rem;
+}
