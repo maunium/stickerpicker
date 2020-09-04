@@ -45,3 +45,10 @@ This requires logging in with your account instead of a bot token.
 3. Open the sticker picker and enjoy the fast sticker picking experience.
 
 [1]: https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
+
+## Preview
+### Element Web
+![Element Web](preview-element-web.png)
+
+### Element Android
+![Element Android](preview-element-android.png)
