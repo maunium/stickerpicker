@@ -179,6 +179,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
             "hash": pack.set.hash,
             "stickers": list(reuploaded_documents.values()),
         }, pack_file, ensure_ascii=False)
+    print(f"Saved {pack.set.title} as {pack.set.short_name}.json")
 
     add_to_index(os.path.basename(pack_path))
 
@@ -211,7 +212,6 @@ async def main():
         for input_pack in input_packs:
             pack: StickerSetFull = await client(GetStickerSetRequest(input_pack))
             await reupload_pack(client, pack)
-            print(f"Saved {pack.set.title} as {pack.set.short_name}.json")
     else:
         parser.print_help()
 
