@@ -16,6 +16,7 @@ let HOMESERVER_URL = "https://matrix-client.matrix.org"
 const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
+// This is also used to fix scrolling to sections on Element iOS
 const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
 
 class App extends Component {
@@ -119,8 +120,17 @@ class App extends Component {
 	}
 }
 
+// By default we just let the browser handle scrolling to sections, but webviews on Element iOS
+// open the link in the browser instead of just scrolling there, so we need to scroll manually:
+const scrollToSection = (evt, id) => {
+	const pack = document.getElementById(`pack-${id}`)
+	pack.scrollIntoView({ block: "start", behavior: "instant" })
+	evt.preventDefault()
+}
+
 const NavBarItem = ({ pack }) => html`
-	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}>
+	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}
+	   onClick=${isMobileSafari ? (evt => scrollToSection(evt, pack.id)) : undefined}>
 		<div class="sticker">
 			<img src=${makeThumbnailURL(pack.stickers[0].url)}
 				 alt=${pack.stickers[0].body} class="visible" />
