@@ -1,64 +1,62 @@
-/*
-Copyright (c) 2020 Tulir Asokan
-
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
-*/
-
 * {
-    font-family: sans-serif;
-}
+  font-family: sans-serif; }
 
 html {
-    scrollbar-width: none;
-}
+  scrollbar-width: none; }
+  html::-webkit-scrollbar {
+    display: none; }
 
 body {
-    margin: 0;
-}
-
-.main:not(.pack-list) {
-    margin: 2rem;
-}
-
-.main.empty {
-    text-align: center;
-}
-
-.stickerpack > .sticker-list {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.stickerpack > h1 {
-    margin: .75rem;
-}
-
-.sticker {
-    display: flex;
-    padding: 4px;
-    cursor: pointer;
-    position: relative;
-    width: 25vw;
-    height: 25vw;
-    box-sizing: border-box;
-}
-
-.sticker:hover {
-    background-color: #eee;
-}
-
-.sticker > img {
-    display: none;
-    width: 100%;
-    object-fit: contain;
-}
-
-.sticker > img.visible {
-    display: initial;
-}
+  margin: 0; }
 
 h1 {
-    font-size: 1rem;
-}
+  font-size: 1rem; }
+
+main.spinner, main.error, main.empty {
+  margin: 2rem; }
+
+main.empty {
+  text-align: center; }
+
+nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12vw;
+  background-color: white;
+  z-index: 10; }
+  nav::-webkit-scrollbar {
+    display: none; }
+  nav div.sticker {
+    width: 12vw;
+    height: 12vw; }
+
+section.stickerpack {
+  padding-top: 12vw;
+  margin-top: -12vw; }
+  section.stickerpack > div.sticker-list {
+    display: flex;
+    flex-wrap: wrap; }
+  section.stickerpack > h1 {
+    margin: .75rem; }
+
+div.sticker {
+  display: flex;
+  padding: 4px;
+  cursor: pointer;
+  position: relative;
+  width: 25vw;
+  height: 25vw;
+  box-sizing: border-box; }
+  div.sticker:hover {
+    background-color: #eee; }
+  div.sticker > img {
+    display: none;
+    width: 100%;
+    object-fit: contain; }
+    div.sticker > img.visible {
+      display: initial; }

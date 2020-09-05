@@ -24,6 +24,7 @@ class App extends Component {
 			error: null,
 		}
 		this.observer = null
+		this.packListRef = null
 	}
 
 	observeIntersection = intersections => {
@@ -67,7 +68,7 @@ class App extends Component {
 	}
 
 	componentDidUpdate() {
-		for (const elem of document.getElementsByClassName("sticker")) {
+		for (const elem of this.packListRef.getElementsByClassName("sticker")) {
 			this.observer.observe(elem)
 		}
 	}
@@ -78,29 +79,41 @@ class App extends Component {
 
 	render() {
 		if (this.state.loading) {
-			return html`<div class="main spinner"><${Spinner} size=${80} green /></div>`
+			return html`<main class="spinner"><${Spinner} size=${80} green /></main>`
 		} else if (this.state.error) {
-			return html`<div class="main error">
+			return html`<main class="error">
 				<h1>Failed to load packs</h1>
 				<p>${this.state.error}</p>
-			</div>`
+			</main>`
 		} else if (this.state.packs.length === 0) {
-			return html`<div class="main empty"><h1>No packs found :(</h1></div>`
+			return html`<main class="empty"><h1>No packs found :(</h1></main>`
 		}
-		return html`<div class="main pack-list">
-			${this.state.packs.map(pack => html`<${Pack} id=${pack.id} ...${pack}/>`)}
-		</div>`
+		return html`<main>
+			<nav>
+				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
+			</nav>
+			<div class="pack-list" ref=${elem => this.packListRef = elem}>
+				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack}/>`)}
+			</div>
+		</main>`
 	}
 }
 
-const Pack = ({ title, stickers }) => html`<div class="stickerpack">
-	<h1>${title}</h1>
+const NavBarItem = ({ pack }) => html`<a href="#pack-${pack.id}" title=${pack.title}>
+	<div class="sticker">
+		<img src=${makeThumbnailURL(pack.stickers[0].url)}
+			 alt=${pack.stickers[0].body} class="visible" />
+	 </div>
+</a>`
+
+const Pack = ({ pack }) => html`<section class="stickerpack" id=${`pack-${pack.id}`}>
+	<h1>${pack.title}</h1>
 	<div class="sticker-list">
-		${stickers.map(sticker => html`
+		${pack.stickers.map(sticker => html`
 			<${Sticker} key=${sticker["net.maunium.telegram.sticker"].id} content=${sticker}/>
 		`)}
 	</div>
-</div>`
+</section>`
 
 const Sticker = ({ content }) => html`<div class="sticker" onClick=${() => sendSticker(content)}>
 	<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />

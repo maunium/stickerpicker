@@ -1,0 +1,82 @@
+// Copyright (c) 2020 Tulir Asokan
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+*
+  font-family: sans-serif
+
+html
+  scrollbar-width: none
+
+  &::-webkit-scrollbar
+    display: none
+
+body
+  margin: 0
+
+h1
+  font-size: 1rem
+
+main
+  &.spinner, &.error, &.empty
+    margin: 2rem
+
+  &.empty
+    text-align: center
+
+nav
+  display: flex
+  overflow-x: auto
+  scrollbar-width: none
+
+  &::-webkit-scrollbar
+    display: none
+
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  height: 12vw
+
+  background-color: white
+  z-index: 10
+
+  div.sticker
+    width: 12vw
+    height: 12vw
+
+section.stickerpack
+  // This is a slightly hacky hack so that we can simultaneously have:
+  // * Anchor URLs scroll so the header is visible
+  // * The scroll area is the whole document
+  padding-top: 12vw
+  margin-top: -12vw
+
+  > div.sticker-list
+    display: flex
+    flex-wrap: wrap
+
+  > h1
+    margin: .75rem
+
+div.sticker
+  display: flex
+  padding: 4px
+  cursor: pointer
+  position: relative
+  width: 25vw
+  height: 25vw
+  box-sizing: border-box
+
+  &:hover
+    background-color: #eee
+
+  > img
+    display: none
+    width: 100%
+    object-fit: contain
+
+    &.visible
+      display: initial
