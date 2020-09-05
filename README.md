@@ -6,11 +6,10 @@ A fast and simple Matrix sticker picker widget. Tested on Element Web & Android.
    1. Create with `virtualenv -p python3 .`
    2. Activate with `source ./bin/activate`
 2. Install dependencies with `pip install -r requirements.txt`
-3. Copy `example-config.json` to `config.json` and set your homeserver URL and access token
-   (used for uploading stickers to Matrix).
-4. Run `python3 import.py <pack urls...>`
-   * On the first run, it'll prompt you to log in with a bot token or a telegram account.
-     The session data is stored in `sticker-import.session` by default.
+3. Run `python3 import.py <pack urls...>`
+   * On the first run, it'll prompt you to log in to Matrix and Telegram.
+     * The Matrix URL and access token are stored in `config.json` by default.
+     * The Telethon session data is stored in `sticker-import.session` by default.
    * By default, the pack data will be written to `web/packs/`.
    * You can pass as many pack URLs as you want.
    * You can re-run the command with the same URLs to update packs.

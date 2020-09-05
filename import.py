@@ -31,11 +31,36 @@ parser.add_argument("--output-dir", help="Directory to write packs to", default=
 parser.add_argument("pack", help="Sticker pack URLs to import", action="append", nargs="*")
 args = parser.parse_args()
 
-with open(args.config) as config_file:
-    config = json.load(config_file)
-    homeserver_url = config["homeserver"]
-    upload_url = URL(homeserver_url) / "_matrix" / "media" / "r0" / "upload"
-    access_token = config["access_token"]
+
+async def whoami(url: URL, access_token: str) -> str:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    async with ClientSession() as sess, sess.get(url, headers=headers) as resp:
+        resp.raise_for_status()
+        user_id = (await resp.json())["user_id"]
+        print(f"Access token validated (user ID: {user_id})")
+        return user_id
+
+
+try:
+    with open(args.config) as config_file:
+        config = json.load(config_file)
+        homeserver_url = config["homeserver"]
+        access_token = config["access_token"]
+except FileNotFoundError:
+    print("Matrix config file not found. Please enter your homeserver and access token.")
+    homeserver_url = input("Homeserver URL: ")
+    access_token = input("Access token: ")
+    whoami_url = URL(homeserver_url) / "_matrix" / "client" / "r0" / "account" / "whoami"
+    user_id = asyncio.run(whoami(whoami_url, access_token))
+    with open(args.config, "w") as config_file:
+        json.dump({
+            "homeserver": homeserver_url,
+            "user_id": user_id,
+            "access_token": access_token
+        }, config_file)
+    print(f"Wrote config to {args.config}")
+
+upload_url = URL(homeserver_url) / "_matrix" / "media" / "r0" / "upload"
 
 
 async def upload(data: bytes, mimetype: str, filename: str) -> str:
