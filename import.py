@@ -85,7 +85,6 @@ class MatrixStickerInfo(TypedDict, total=False):
 
 def convert_image(data: bytes) -> (bytes, int, int):
     image: Image.Image = Image.open(BytesIO(data)).convert("RGBA")
-    image.thumbnail((256, 256), Image.ANTIALIAS)
     new_file = BytesIO()
     image.save(new_file, "png")
     w, h = image.size
@@ -100,6 +99,14 @@ async def reupload_document(client: TelegramClient, document: Document) -> Matri
     print(".", end="", flush=True)
     mxc = await upload(data, "image/png", f"{document.id}.png")
     print(".", flush=True)
+    if width > 256 or height > 256:
+        # Set the width and height to lower values so clients wouldn't show them as huge images
+        if width > height:
+            height = int(height / (width / 256))
+            width = 256
+        else:
+            width = int(width / (height / 256))
+            height = 256
     return {
         "body": "",
         "url": mxc,
@@ -108,6 +115,14 @@ async def reupload_document(client: TelegramClient, document: Document) -> Matri
             "h": height,
             "size": len(data),
             "mimetype": "image/png",
+
+            # Element iOS compatibility hack
+            "thumbnail_url": mxc,
+            "thumbnail_info": {
+                "w": width,
+                "h": height,
+                "size": len(data),
+            },
         },
     }
 
