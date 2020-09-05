@@ -4,6 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import { html, render, Component } from "https://unpkg.com/htm/preact/index.mjs?module"
+import { Spinner } from "./spinner.js"
+import { sendSticker } from "./widget-api.js"
 
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
@@ -91,31 +93,6 @@ class App extends Component {
 	}
 }
 
-const Spinner = ({ size = 40, noCenter = false, noMargin = false, green = false }) => {
-	let margin = 0
-	if (!isNaN(+size)) {
-		size = +size
-		margin = noMargin ? 0 : `${Math.round(size / 6)}px`
-		size = `${size}px`
-	}
-	const noInnerMargin = !noCenter || !margin
-	const comp = html`
-        <div style="width: ${size}; height: ${size}; margin: ${noInnerMargin ? 0 : margin} 0;"
-             class="sk-chase ${green && "green"}">
-            <div class="sk-chase-dot" />
-            <div class="sk-chase-dot" />
-            <div class="sk-chase-dot" />
-            <div class="sk-chase-dot" />
-            <div class="sk-chase-dot" />
-            <div class="sk-chase-dot" />
-        </div>
-    `
-	if (!noCenter) {
-		return html`<div style="margin: ${margin} 0;" class="sk-center-wrapper">${comp}</div>`
-	}
-	return comp
-}
-
 const Pack = ({ title, stickers }) => html`<div class="stickerpack">
 	<h1>${title}</h1>
 	<div class="sticker-list">
@@ -128,48 +105,5 @@ const Pack = ({ title, stickers }) => html`<div class="stickerpack">
 const Sticker = ({ content }) => html`<div class="sticker" onClick=${() => sendSticker(content)}>
 	<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
 </div>`
-
-function sendSticker(content) {
-	window.parent.postMessage({
-		api: "fromWidget",
-		action: "m.sticker",
-		requestId: `sticker-${Date.now()}`,
-		widgetId,
-		data: {
-			name: content.body,
-			content,
-		},
-	}, "*")
-}
-
-let widgetId = null
-
-window.onmessage = event => {
-	if (!window.parent || !event.data) {
-		return
-	}
-
-	const request = event.data
-	if (!request.requestId || !request.widgetId || !request.action || request.api !== "toWidget") {
-		return
-	}
-
-	if (widgetId) {
-		if (widgetId !== request.widgetId) {
-			return
-		}
-	} else {
-		widgetId = request.widgetId
-	}
-
-	window.parent.postMessage({
-		...request,
-		response: request.action === "capabilities" ? {
-			capabilities: ["m.sticker"],
-		} : {
-			error: { message: "Action not supported" },
-		},
-	}, event.origin)
-}
 
 render(html`<${App} />`, document.body)
