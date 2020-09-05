@@ -49,13 +49,13 @@ class App extends Component {
 			}
 		}, error => this.setState({ loading: false, error }))
 
-		this.imageObserver = new IntersectionObserver(this.observeImageIntersection, {
+		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
 			rootMargin: "100px",
 		})
-		this.sectionObserver = new IntersectionObserver(this.observeSectionIntersection, {})
+		this.sectionObserver = new IntersectionObserver(this.observeSectionIntersections)
 	}
 
-	observeImageIntersection = intersections => {
+	observeImageIntersections(intersections) {
 		for (const entry of intersections) {
 			const img = entry.target.children.item(0)
 			if (entry.isIntersecting) {
@@ -68,7 +68,7 @@ class App extends Component {
 		}
 	}
 
-	observeSectionIntersection = intersections => {
+	observeSectionIntersections(intersections) {
 		for (const entry of intersections) {
 			const packID = entry.target.getAttribute("data-pack-id")
 			const navElement = document.getElementById(`nav-${packID}`)
