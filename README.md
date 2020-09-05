@@ -1,6 +1,9 @@
 # Maunium sticker picker
 A fast and simple Matrix sticker picker widget. Tested on Element Web & Android.
 
+## Discussion
+Matrix room: [`#maunium:maunium.net`](https://matrix.to/#/#maunium:maunium.net)
+
 ## Importing packs from Telegram
 1. (Optional) Set up a virtual environment.
    1. Create with `virtualenv -p python3 .`
