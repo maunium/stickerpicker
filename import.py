@@ -3,7 +3,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from typing import Dict, TypedDict
+from typing import Dict, TypedDict, Optional
 from io import BytesIO
 import argparse
 import os.path
@@ -75,6 +75,8 @@ class MatrixMediaInfo(TypedDict):
     h: int
     size: int
     mimetype: str
+    thumbnail_url: Optional[str]
+    thumbnail_info: Optional['MatrixMediaInfo']
 
 
 class MatrixStickerInfo(TypedDict, total=False):
@@ -122,6 +124,7 @@ async def reupload_document(client: TelegramClient, document: Document) -> Matri
                 "w": width,
                 "h": height,
                 "size": len(data),
+                "mimetype": "image/png",
             },
         },
     }
