@@ -15,6 +15,9 @@ let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
 const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
 
+// We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
+const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
+
 class App extends Component {
 	constructor(props) {
 		super(props)
@@ -109,7 +112,7 @@ class App extends Component {
 			<nav>
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 			</nav>
-			<div class="pack-list" ref=${elem => this.packListRef = elem}>
+			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
 				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack}/>`)}
 			</div>
 		</main>`

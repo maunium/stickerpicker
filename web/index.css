@@ -46,6 +46,14 @@ div.pack-list, nav {
 div.pack-list {
   overflow-y: auto; }
 
+div.pack-list.ios-safari-hack {
+  position: fixed;
+  top: calc(12vw + 2px);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  -webkit-overflow-scrolling: touch; }
+
 section.stickerpack {
   margin-top: .75rem; }
   section.stickerpack > div.sticker-list {
