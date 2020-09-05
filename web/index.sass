@@ -7,67 +7,80 @@
 *
   font-family: sans-serif
 
-html
-  scrollbar-width: none
-
-  &::-webkit-scrollbar
-    display: none
-
 body
   margin: 0
 
 h1
   font-size: 1rem
 
+$sticker-size: 25vw
+$nav-sticker-size: 12vw
+$nav-bottom-highlight: 2px
+$nav-height: calc(#{$nav-sticker-size} + #{$nav-bottom-highlight})
+$nav-height-inverse: calc(-#{$nav-sticker-size} - #{$nav-bottom-highlight})
+
 main
-  &.spinner, &.error, &.empty
+  &.spinner
+    margin-top: 5rem
+
+  &.error, &.empty
     margin: 2rem
 
   &.empty
     text-align: center
 
+  &.has-content
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+    display: grid
+    grid-template-rows: $nav-height auto
+
 nav
   display: flex
   overflow-x: auto
+
+  height: $nav-height
+
+  background-color: white
+
+  > a
+    border-bottom: $nav-bottom-highlight solid transparent
+    &.visible
+      border-bottom-color: green
+    > div.sticker
+      width: $nav-sticker-size
+      height: $nav-sticker-size
+
+div.pack-list, nav
   scrollbar-width: none
 
   &::-webkit-scrollbar
     display: none
 
-  position: fixed
-  top: 0
-  left: 0
-  right: 0
-  height: 12vw
-
-  background-color: white
-  z-index: 10
-
-  div.sticker
-    width: 12vw
-    height: 12vw
+div.pack-list
+  overflow-y: auto
 
 section.stickerpack
-  // This is a slightly hacky hack so that we can simultaneously have:
-  // * Anchor URLs scroll so the header is visible
-  // * The scroll area is the whole document
-  padding-top: 12vw
-  margin-top: -12vw
+  margin-top: .75rem
 
   > div.sticker-list
     display: flex
     flex-wrap: wrap
 
   > h1
-    margin: .75rem
+    margin: 0 0 0 .75rem
 
 div.sticker
   display: flex
   padding: 4px
   cursor: pointer
   position: relative
-  width: 25vw
-  height: 25vw
+  width: $sticker-size
+  height: $sticker-size
   box-sizing: border-box
 
   &:hover

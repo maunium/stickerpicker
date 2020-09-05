@@ -23,21 +23,8 @@ class App extends Component {
 			loading: true,
 			error: null,
 		}
-		this.observer = null
+		this.imageObserver = null
 		this.packListRef = null
-	}
-
-	observeIntersection = intersections => {
-		for (const entry of intersections) {
-			const img = entry.target.children.item(0)
-			if (entry.isIntersecting) {
-				img.setAttribute("src", img.getAttribute("data-src"))
-				img.classList.add("visible")
-			} else {
-				img.removeAttribute("src")
-				img.classList.remove("visible")
-			}
-		}
 	}
 
 	componentDidMount() {
@@ -61,20 +48,50 @@ class App extends Component {
 				})
 			}
 		}, error => this.setState({ loading: false, error }))
-		this.observer = new IntersectionObserver(this.observeIntersection, {
+
+		this.imageObserver = new IntersectionObserver(this.observeImageIntersection, {
 			rootMargin: "100px",
-			threshold: 0,
 		})
+		this.sectionObserver = new IntersectionObserver(this.observeSectionIntersection, {})
+	}
+
+	observeImageIntersection = intersections => {
+		for (const entry of intersections) {
+			const img = entry.target.children.item(0)
+			if (entry.isIntersecting) {
+				img.setAttribute("src", img.getAttribute("data-src"))
+				img.classList.add("visible")
+			} else {
+				img.removeAttribute("src")
+				img.classList.remove("visible")
+			}
+		}
+	}
+
+	observeSectionIntersection = intersections => {
+		for (const entry of intersections) {
+			const packID = entry.target.getAttribute("data-pack-id")
+			const navElement = document.getElementById(`nav-${packID}`)
+			if (entry.isIntersecting) {
+				navElement.classList.add("visible")
+			} else {
+				navElement.classList.remove("visible")
+			}
+		}
 	}
 
 	componentDidUpdate() {
 		for (const elem of this.packListRef.getElementsByClassName("sticker")) {
-			this.observer.observe(elem)
+			this.imageObserver.observe(elem)
+		}
+		for (const elem of this.packListRef.children) {
+			this.sectionObserver.observe(elem)
 		}
 	}
 
 	componentWillUnmount() {
-		this.observer.disconnect()
+		this.imageObserver.disconnect()
+		this.sectionObserver.disconnect()
 	}
 
 	render() {
@@ -86,9 +103,9 @@ class App extends Component {
 				<p>${this.state.error}</p>
 			</main>`
 		} else if (this.state.packs.length === 0) {
-			return html`<main class="empty"><h1>No packs found :(</h1></main>`
+			return html`<main class="empty"><h1>No packs found 😿</h1></main>`
 		}
-		return html`<main>
+		return html`<main class="has-content">
 			<nav>
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 			</nav>
@@ -99,24 +116,30 @@ class App extends Component {
 	}
 }
 
-const NavBarItem = ({ pack }) => html`<a href="#pack-${pack.id}" title=${pack.title}>
-	<div class="sticker">
-		<img src=${makeThumbnailURL(pack.stickers[0].url)}
-			 alt=${pack.stickers[0].body} class="visible" />
-	 </div>
-</a>`
+const NavBarItem = ({ pack }) => html`
+	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}>
+		<div class="sticker">
+			<img src=${makeThumbnailURL(pack.stickers[0].url)}
+				 alt=${pack.stickers[0].body} class="visible" />
+		</div>
+	</a>
+`
 
-const Pack = ({ pack }) => html`<section class="stickerpack" id=${`pack-${pack.id}`}>
-	<h1>${pack.title}</h1>
-	<div class="sticker-list">
-		${pack.stickers.map(sticker => html`
-			<${Sticker} key=${sticker["net.maunium.telegram.sticker"].id} content=${sticker}/>
-		`)}
+const Pack = ({ pack }) => html`
+	<section class="stickerpack" id="pack-${pack.id}" data-pack-id=${pack.id}>
+		<h1>${pack.title}</h1>
+		<div class="sticker-list">
+			${pack.stickers.map(sticker => html`
+				<${Sticker} key=${sticker["net.maunium.telegram.sticker"].id} content=${sticker}/>
+			`)}
+		</div>
+	</section>
+`
+
+const Sticker = ({ content }) => html`
+	<div class="sticker" onClick=${() => sendSticker(content)}>
+		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
 	</div>
-</section>`
-
-const Sticker = ({ content }) => html`<div class="sticker" onClick=${() => sendSticker(content)}>
-	<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
-</div>`
+`
 
 render(html`<${App} />`, document.body)

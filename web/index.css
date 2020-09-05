@@ -1,48 +1,58 @@
 * {
   font-family: sans-serif; }
 
-html {
-  scrollbar-width: none; }
-  html::-webkit-scrollbar {
-    display: none; }
-
 body {
   margin: 0; }
 
 h1 {
   font-size: 1rem; }
 
-main.spinner, main.error, main.empty {
+main.spinner {
+  margin-top: 5rem; }
+
+main.error, main.empty {
   margin: 2rem; }
 
 main.empty {
   text-align: center; }
 
-nav {
-  display: flex;
-  overflow-x: auto;
-  scrollbar-width: none;
+main.has-content {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 12vw;
-  background-color: white;
-  z-index: 10; }
-  nav::-webkit-scrollbar {
+  bottom: 0;
+  display: grid;
+  grid-template-rows: calc(12vw + 2px) auto; }
+
+nav {
+  display: flex;
+  overflow-x: auto;
+  height: calc(12vw + 2px);
+  background-color: white; }
+  nav > a {
+    border-bottom: 2px solid transparent; }
+    nav > a.visible {
+      border-bottom-color: green; }
+    nav > a > div.sticker {
+      width: 12vw;
+      height: 12vw; }
+
+div.pack-list, nav {
+  scrollbar-width: none; }
+  div.pack-list::-webkit-scrollbar, nav::-webkit-scrollbar {
     display: none; }
-  nav div.sticker {
-    width: 12vw;
-    height: 12vw; }
+
+div.pack-list {
+  overflow-y: auto; }
 
 section.stickerpack {
-  padding-top: 12vw;
-  margin-top: -12vw; }
+  margin-top: .75rem; }
   section.stickerpack > div.sticker-list {
     display: flex;
     flex-wrap: wrap; }
   section.stickerpack > h1 {
-    margin: .75rem; }
+    margin: 0 0 0 .75rem; }
 
 div.sticker {
   display: flex;
