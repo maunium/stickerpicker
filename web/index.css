@@ -37,6 +37,10 @@ nav {
     nav > a > div.sticker {
       width: 12vw;
       height: 12vw; }
+    nav > a > div.sticker.icon > img {
+      width: 70%;
+      height: 70%;
+      padding: 15%; }
 
 div.pack-list, nav {
   scrollbar-width: none; }

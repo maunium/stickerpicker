@@ -5,7 +5,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import { html, render, Component } from "https://unpkg.com/htm/preact/index.mjs?module"
 import { Spinner } from "./spinner.js"
-import { sendSticker } from "./widget-api.js"
+import * as widgetAPI from "./widget-api.js"
+import * as frequent from "./frequently-used.js"
 
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
@@ -26,9 +27,35 @@ class App extends Component {
 			packs: [],
 			loading: true,
 			error: null,
+			frequentlyUsed: {
+				id: "frequently-used",
+				title: "Frequently used",
+				stickerIDs: frequent.get(),
+				stickers: [],
+			},
 		}
+		this.stickersByID = new Map(JSON.parse(localStorage.mauFrequentlyUsedStickerCache || "[]"))
+		this.state.frequentlyUsed.stickers = this._getStickersByID(this.state.frequentlyUsed.stickerIDs)
 		this.imageObserver = null
 		this.packListRef = null
+		this.sendSticker = this.sendSticker.bind(this)
+	}
+
+	_getStickersByID(ids) {
+		return ids.map(id => this.stickersByID.get(id)).filter(sticker => !!sticker)
+	}
+
+	updateFrequentlyUsed() {
+		const stickerIDs = frequent.get()
+		const stickers = this._getStickersByID(stickerIDs)
+		this.setState({
+			frequentlyUsed: {
+				...this.state.frequentlyUsed,
+				stickerIDs,
+				stickers
+			}
+		})
+		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
 	}
 
 	componentDidMount() {
@@ -46,11 +73,15 @@ class App extends Component {
 			for (const packFile of indexData.packs) {
 				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`)
 				const packData = await packRes.json()
+				for (const sticker of packData.stickers) {
+					this.stickersByID.set(sticker.id, sticker)
+				}
 				this.setState({
 					packs: [...this.state.packs, packData],
 					loading: false,
 				})
 			}
+			this.updateFrequentlyUsed()
 		}, error => this.setState({ loading: false, error }))
 
 		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
@@ -98,6 +129,14 @@ class App extends Component {
 		this.sectionObserver.disconnect()
 	}
 
+	sendSticker(evt) {
+		const id = evt.currentTarget.getAttribute("data-sticker-id")
+		const sticker = this.stickersByID.get(id)
+		frequent.add(id)
+		this.updateFrequentlyUsed()
+		widgetAPI.sendSticker(sticker)
+	}
+
 	render() {
 		if (this.state.loading) {
 			return html`<main class="spinner"><${Spinner} size=${80} green /></main>`
@@ -111,10 +150,12 @@ class App extends Component {
 		}
 		return html`<main class="has-content">
 			<nav>
+				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="res/recent.svg" altOverride="🕓️" />
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 			</nav>
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
-				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack}/>`)}
+				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
+				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
 			</div>
 		</main>`
 	}
@@ -128,29 +169,33 @@ const scrollToSection = (evt, id) => {
 	evt.preventDefault()
 }
 
-const NavBarItem = ({ pack }) => html`
+const NavBarItem = ({ pack, iconOverride = null, altOverride = null }) => html`
 	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}
 	   onClick=${isMobileSafari ? (evt => scrollToSection(evt, pack.id)) : undefined}>
-		<div class="sticker">
-			<img src=${makeThumbnailURL(pack.stickers[0].url)}
-				 alt=${pack.stickers[0].body} class="visible" />
+		<div class="sticker ${iconOverride ? "icon" : ""}">
+			${iconOverride ? html`
+				<img src=${iconOverride} alt=${altOverride} class="visible"/>
+			` : html`
+				<img src=${makeThumbnailURL(pack.stickers[0].url)}
+					alt=${pack.stickers[0].body} class="visible" />
+			`}
 		</div>
 	</a>
 `
 
-const Pack = ({ pack }) => html`
+const Pack = ({ pack, send }) => html`
 	<section class="stickerpack" id="pack-${pack.id}" data-pack-id=${pack.id}>
 		<h1>${pack.title}</h1>
 		<div class="sticker-list">
 			${pack.stickers.map(sticker => html`
-				<${Sticker} key=${sticker.id} content=${sticker}/>
+				<${Sticker} key=${sticker.id} content=${sticker} send=${send}/>
 			`)}
 		</div>
 	</section>
 `
 
-const Sticker = ({ content }) => html`
-	<div class="sticker" onClick=${() => sendSticker(content)}>
+const Sticker = ({ content, send }) => html`
+	<div class="sticker" onClick=${send} data-sticker-id=${content.id}>
 		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
 	</div>
 `
