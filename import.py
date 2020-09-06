@@ -18,7 +18,7 @@ from PIL import Image
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetAllStickersRequest, GetStickerSetRequest
 from telethon.tl.types.messages import AllStickers
-from telethon.tl.types import InputStickerSetShortName, Document
+from telethon.tl.types import InputStickerSetShortName, Document, DocumentAttributeSticker
 from telethon.tl.types.messages import StickerSet as StickerSetFull
 
 parser = argparse.ArgumentParser()
@@ -71,6 +71,9 @@ async def upload(data: bytes, mimetype: str, filename: str) -> str:
 
 
 if TYPE_CHECKING:
+    from typing import TypedDict
+
+
     class MatrixMediaInfo(TypedDict):
         w: int
         h: int
@@ -110,8 +113,12 @@ async def reupload_document(client: TelegramClient, document: Document) -> 'Matr
         else:
             width = int(width / (height / 256))
             height = 256
+    body = ""
+    for attr in document.attributes:
+        if isinstance(attr, DocumentAttributeSticker):
+            body = attr.alt
     return {
-        "body": "",
+        "body": body,
         "url": mxc,
         "info": {
             "w": width,
@@ -163,7 +170,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
     try:
         with open(pack_path) as pack_file:
             existing_pack = json.load(pack_file)
-            already_uploaded = {sticker["net.maunium.telegram.sticker"]["id"]: sticker
+            already_uploaded = {int(sticker["net.maunium.telegram.sticker"]["id"]): sticker
                                 for sticker in existing_pack["stickers"]}
             print(f"Found {len(already_uploaded)} already reuploaded stickers")
     except FileNotFoundError:
@@ -176,26 +183,26 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
             print(f"Skipped reuploading {document.id}")
         except KeyError:
             reuploaded_documents[document.id] = await reupload_document(client, document)
+        reuploaded_documents[document.id]["net.maunium.telegram.sticker"] = {
+            "pack": {
+                "id": str(pack.set.id),
+                "short_name": pack.set.short_name,
+            },
+            "id": str(document.id),
+            "emoticons": [],
+        }
 
     for sticker in pack.packs:
         for document_id in sticker.documents:
             doc = reuploaded_documents[document_id]
-            doc["body"] = sticker.emoticon
-            doc["net.maunium.telegram.sticker"] = {
-                "pack": {
-                    "id": pack.set.id,
-                    "short_name": pack.set.short_name,
-                },
-                "id": document_id,
-                "emoticon": sticker.emoticon,
-            }
+            doc["net.maunium.telegram.sticker"]["emoticons"].append(sticker.emoticon)
 
     with open(pack_path, "w") as pack_file:
         json.dump({
             "title": pack.set.title,
             "short_name": pack.set.short_name,
-            "id": pack.set.id,
-            "hash": pack.set.hash,
+            "id": str(pack.set.id),
+            "hash": str(pack.set.hash),
             "stickers": list(reuploaded_documents.values()),
         }, pack_file, ensure_ascii=False)
     print(f"Saved {pack.set.title} as {pack.set.short_name}.json")
