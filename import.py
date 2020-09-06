@@ -3,7 +3,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from typing import Dict, TypedDict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 from io import BytesIO
 import argparse
 import os.path
@@ -70,19 +70,20 @@ async def upload(data: bytes, mimetype: str, filename: str) -> str:
         return (await resp.json())["content_uri"]
 
 
-class MatrixMediaInfo(TypedDict):
-    w: int
-    h: int
-    size: int
-    mimetype: str
-    thumbnail_url: Optional[str]
-    thumbnail_info: Optional['MatrixMediaInfo']
+if TYPE_CHECKING:
+    class MatrixMediaInfo(TypedDict):
+        w: int
+        h: int
+        size: int
+        mimetype: str
+        thumbnail_url: Optional[str]
+        thumbnail_info: Optional['MatrixMediaInfo']
 
 
-class MatrixStickerInfo(TypedDict, total=False):
-    body: str
-    url: str
-    info: MatrixMediaInfo
+    class MatrixStickerInfo(TypedDict, total=False):
+        body: str
+        url: str
+        info: MatrixMediaInfo
 
 
 def convert_image(data: bytes) -> (bytes, int, int):
@@ -93,7 +94,7 @@ def convert_image(data: bytes) -> (bytes, int, int):
     return new_file.getvalue(), w, h
 
 
-async def reupload_document(client: TelegramClient, document: Document) -> MatrixStickerInfo:
+async def reupload_document(client: TelegramClient, document: Document) -> 'MatrixStickerInfo':
     print(f"Reuploading {document.id}", end="", flush=True)
     data = await client.download_media(document, file=bytes)
     print(".", end="", flush=True)
@@ -168,7 +169,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
     except FileNotFoundError:
         pass
 
-    reuploaded_documents: Dict[int, MatrixStickerInfo] = {}
+    reuploaded_documents: Dict[int, 'MatrixStickerInfo'] = {}
     for document in pack.documents:
         try:
             reuploaded_documents[document.id] = already_uploaded[document.id]
