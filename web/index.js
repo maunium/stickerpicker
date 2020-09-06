@@ -38,7 +38,9 @@ class App extends Component {
 		this.state.frequentlyUsed.stickers = this._getStickersByID(this.state.frequentlyUsed.stickerIDs)
 		this.imageObserver = null
 		this.packListRef = null
+		this.navRef = null
 		this.sendSticker = this.sendSticker.bind(this)
+		this.navScroll = this.navScroll.bind(this)
 	}
 
 	_getStickersByID(ids) {
@@ -137,6 +139,10 @@ class App extends Component {
 		widgetAPI.sendSticker(sticker)
 	}
 
+	navScroll(evt) {
+		this.navRef.scrollLeft += evt.deltaY * 12
+	}
+
 	render() {
 		if (this.state.loading) {
 			return html`<main class="spinner"><${Spinner} size=${80} green /></main>`
@@ -149,7 +155,7 @@ class App extends Component {
 			return html`<main class="empty"><h1>No packs found 😿</h1></main>`
 		}
 		return html`<main class="has-content">
-			<nav>
+			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
 				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="res/recent.svg" altOverride="🕓️" />
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 			</nav>
