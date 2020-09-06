@@ -252,5 +252,7 @@ async def main():
     else:
         parser.print_help()
 
+    await client.disconnect()
 
-asyncio.run(main())
+
+asyncio.get_event_loop().run_until_complete(main())
