@@ -87,6 +87,7 @@ if TYPE_CHECKING:
         body: str
         url: str
         info: MatrixMediaInfo
+        id: str
 
 
 def convert_image(data: bytes) -> (bytes, int, int):
@@ -113,12 +114,8 @@ async def reupload_document(client: TelegramClient, document: Document) -> 'Matr
         else:
             width = int(width / (height / 256))
             height = 256
-    body = ""
-    for attr in document.attributes:
-        if isinstance(attr, DocumentAttributeSticker):
-            body = attr.alt
     return {
-        "body": body,
+        "body": "",
         "url": mxc,
         "info": {
             "w": width,
@@ -152,6 +149,21 @@ def add_to_index(name: str) -> None:
         print(f"Added {name} to {index_path}")
 
 
+def add_meta(document: Document, info: 'MatrixStickerInfo', pack: StickerSetFull) -> None:
+    for attr in document.attributes:
+        if isinstance(attr, DocumentAttributeSticker):
+            info["body"] = attr.alt
+    info["id"] = str(document.id)
+    info["net.maunium.telegram.sticker"] = {
+        "pack": {
+            "id": str(pack.set.id),
+            "short_name": pack.set.short_name,
+        },
+        "id": str(document.id),
+        "emoticons": [],
+    }
+
+
 async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
     if pack.set.animated:
         print("Animated stickerpacks are currently not supported")
@@ -183,18 +195,17 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
             print(f"Skipped reuploading {document.id}")
         except KeyError:
             reuploaded_documents[document.id] = await reupload_document(client, document)
-        reuploaded_documents[document.id]["net.maunium.telegram.sticker"] = {
-            "pack": {
-                "id": str(pack.set.id),
-                "short_name": pack.set.short_name,
-            },
-            "id": str(document.id),
-            "emoticons": [],
-        }
+        # Always ensure the body and telegram metadata is correct
+        add_meta(document, reuploaded_documents[document.id], pack)
 
     for sticker in pack.packs:
+        if not sticker.emoticon:
+            continue
         for document_id in sticker.documents:
             doc = reuploaded_documents[document_id]
+            # If there was no sticker metadata, use the first emoji we find
+            if doc["body"] == "":
+                doc["body"] = sticker.emoticon
             doc["net.maunium.telegram.sticker"]["emoticons"].append(sticker.emoticon)
 
     with open(pack_path, "w") as pack_file:

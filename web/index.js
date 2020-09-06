@@ -143,7 +143,7 @@ const Pack = ({ pack }) => html`
 		<h1>${pack.title}</h1>
 		<div class="sticker-list">
 			${pack.stickers.map(sticker => html`
-				<${Sticker} key=${sticker["net.maunium.telegram.sticker"].id} content=${sticker}/>
+				<${Sticker} key=${sticker.id} content=${sticker}/>
 			`)}
 		</div>
 	</section>

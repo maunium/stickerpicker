@@ -35,17 +35,19 @@ window.onmessage = event => {
 
 export function sendSticker(content) {
 	const data = {
-		content,
+		content: {...content},
 		// `name` is for Element Web (and also the spec)
 		// Element Android uses content -> body as the name
 		name: content.body,
 	}
+	// Custom field that stores the ID even for non-telegram stickers
+	delete data.content.id
 
 	// This is for Element iOS
 	const widgetData = {
 		...data,
 		description: content.body,
-		file: `${content["net.maunium.telegram.sticker"].id}.png`,
+		file: `${content.id}.png`,
 	}
 	// Element iOS explodes if there are extra fields present
 	delete widgetData.content["net.maunium.telegram.sticker"]
