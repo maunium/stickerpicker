@@ -30,6 +30,7 @@ parser.add_argument("--output-dir", help="Directory to write packs to", default=
                     type=str)
 parser.add_argument("pack", help="Sticker pack URLs to import", action="append", nargs="*")
 args = parser.parse_args()
+loop = asyncio.get_event_loop()
 
 
 async def whoami(url: URL, access_token: str) -> str:
@@ -51,7 +52,7 @@ except FileNotFoundError:
     homeserver_url = input("Homeserver URL: ")
     access_token = input("Access token: ")
     whoami_url = URL(homeserver_url) / "_matrix" / "client" / "r0" / "account" / "whoami"
-    user_id = asyncio.run(whoami(whoami_url, access_token))
+    user_id = loop.run_until_complete(whoami(whoami_url, access_token))
     with open(args.config, "w") as config_file:
         json.dump({
             "homeserver": homeserver_url,
@@ -255,4 +256,4 @@ async def main():
     await client.disconnect()
 
 
-asyncio.get_event_loop().run_until_complete(main())
+loop.run_until_complete(main())
