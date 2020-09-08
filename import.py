@@ -142,7 +142,9 @@ def add_to_index(name: str) -> None:
         with open(index_path) as index_file:
             index_data = json.load(index_file)
     except (FileNotFoundError, json.JSONDecodeError):
-        index_data = {"packs": [], "homeserver_url": homeserver_url}
+        index_data = {"packs": []}
+    if "homeserver_url" not in index_data:
+        index_data["homeserver_url"] = homeserver_url
     if name not in index_data["packs"]:
         index_data["packs"].append(name)
         with open(index_path, "w") as index_file:
@@ -154,7 +156,7 @@ def add_meta(document: Document, info: 'MatrixStickerInfo', pack: StickerSetFull
     for attr in document.attributes:
         if isinstance(attr, DocumentAttributeSticker):
             info["body"] = attr.alt
-    info["id"] = str(document.id)
+    info["id"] = f"tg-{document.id}"
     info["net.maunium.telegram.sticker"] = {
         "pack": {
             "id": str(pack.set.id),
@@ -212,9 +214,11 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull) -> None:
     with open(pack_path, "w") as pack_file:
         json.dump({
             "title": pack.set.title,
-            "short_name": pack.set.short_name,
-            "id": str(pack.set.id),
-            "hash": str(pack.set.hash),
+            "id": f"tg-{pack.set.id}",
+            "net.maunium.telegram.pack": {
+                "short_name": pack.set.short_name,
+                "hash": str(pack.set.hash),
+            },
             "stickers": list(reuploaded_documents.values()),
         }, pack_file, ensure_ascii=False)
     print(f"Saved {pack.set.title} as {pack.set.short_name}.json")
