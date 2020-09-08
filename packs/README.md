@@ -15,6 +15,6 @@ array. The index.json file should look something like this:
     "another_telegram_imported_pack.json",
     "scalar-rabbit.json",
     "scalar-loading_artist.json"
-  }
+  ]
 }
 ```
