@@ -23,19 +23,22 @@ window.onmessage = event => {
 		widgetId = request.widgetId
 	}
 
-	window.parent.postMessage({
-		...request,
-		response: request.action === "capabilities" ? {
-			capabilities: ["m.sticker"],
-		} : {
-			error: { message: "Action not supported" },
-		},
-	}, event.origin)
+	let response
+
+	if (request.action === "visibility") {
+		response = {}
+	} else if (request.action === "capabilities") {
+		response = { capabilities: ["m.sticker"] }
+	} else {
+		response = { error: { message: "Action not supported" } }
+	}
+
+	window.parent.postMessage({ ...request, response }, event.origin)
 }
 
 export function sendSticker(content) {
 	const data = {
-		content: {...content},
+		content: { ...content },
 		// `name` is for Element Web (and also the spec)
 		// Element Android uses content -> body as the name
 		name: content.body,
