@@ -3,7 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import { html, render, Component } from "./lib/htm/preact.js"
+import { html, render, Component } from "../lib/htm/preact.js"
 import { Spinner } from "./spinner.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"

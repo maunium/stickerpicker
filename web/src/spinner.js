@@ -3,7 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import { html } from "https://unpkg.com/htm/preact/index.mjs?module"
+import { html } from "../lib/htm/preact.js"
 
 export const Spinner = ({ size = 40, noCenter = false, noMargin = false, green = false }) => {
 	let margin = 0
