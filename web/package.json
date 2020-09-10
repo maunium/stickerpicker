@@ -1,0 +1,31 @@
+{
+  "name": "maunium-stickerpicker",
+  "version": "0.1.0",
+  "description": "A fast and simple Matrix sticker picker widget",
+  "repository": "https://github.com/maunium/stickerpicker",
+  "author": "Tulir Asokan <tulir@maunium.net>",
+  "license": "MPL-2.0",
+  "private": true,
+  "scripts": {
+    "snowpack": "snowpack",
+    "sass": "node-sass -o . *.sass"
+  },
+  "snowpack": {
+    "install": [
+      "htm/preact"
+    ],
+    "installOptions": {
+      "sourceMap": false,
+      "dest": "lib",
+      "treeshake": true
+    }
+  },
+  "dependencies": {
+    "htm": "^3.0.4",
+    "preact": "^10.4.8",
+    "snowpack": "^2.10.3"
+  },
+  "devDependencies": {
+    "node-sass": "^4.14.1"
+  }
+}

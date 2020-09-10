@@ -5,8 +5,11 @@
 *.pyc
 __pycache__
 
+node_modules
+
 *.session
 *.json
 !example-config.json
 !packs/*.json
+!web/package.json
 *.bak
