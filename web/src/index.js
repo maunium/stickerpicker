@@ -27,6 +27,7 @@ class App extends Component {
 			packs: [],
 			loading: true,
 			error: null,
+			stickersPerRow: parseInt(localStorage.mauStickersPerRow || "4"),
 			frequentlyUsed: {
 				id: "frequently-used",
 				title: "Frequently used",
@@ -59,6 +60,15 @@ class App extends Component {
 			},
 		})
 		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
+	}
+
+	setStickersPerRow(val) {
+		localStorage.mauStickersPerRow = val
+		document.documentElement.style.setProperty("--stickers-per-row", localStorage.mauStickersPerRow)
+		this.setState({
+			stickersPerRow: val,
+		})
+		this.packListRef.scrollTop = this.packListRef.scrollHeight
 	}
 
 	reloadPacks() {
@@ -97,6 +107,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
+		document.documentElement.style.setProperty("--stickers-per-row", this.state.stickersPerRow.toString())
 		this._loadPacks()
 		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
 			rootMargin: "100px",
@@ -189,6 +200,12 @@ const Settings = ({ app }) => html`
 		<h1>Settings</h1>
 		<div class="settings-list">
 			<button onClick=${app.reloadPacks}>Reload</button>
+			<div>
+				<label for="stickers-per-row">Stickers per row: ${app.state.stickersPerRow}</label>
+				<input type="range" min=2 max=10 id="stickers-per-row" id="stickers-per-row"
+					value=${app.state.stickersPerRow}
+					onInput=${evt => app.setStickersPerRow(evt.target.value)} />
+			</div>
 		</div>
 	</section>
 `

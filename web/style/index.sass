@@ -13,7 +13,10 @@ body
 h1
   font-size: 1rem
 
-$sticker-size: 25vw
+\:root
+  --stickers-per-row: 4
+  --sticker-size: calc(100vw / var(--stickers-per-row))
+
 $nav-sticker-size: 12vw
 $nav-bottom-highlight: 2px
 $nav-height: calc(#{$nav-sticker-size} + #{$nav-bottom-highlight})
@@ -91,8 +94,8 @@ div.sticker
   padding: 4px
   cursor: pointer
   position: relative
-  width: $sticker-size
-  height: $sticker-size
+  width: var(--sticker-size)
+  height: var(--sticker-size)
   box-sizing: border-box
 
   &:hover
@@ -108,9 +111,14 @@ div.sticker
 
 div.settings-list
   display: flex
+  flex-direction: column
+
+  > *
+    margin: .5rem
 
   button
-    width: 100%
-    margin: .5rem
     padding: .5rem
     border-radius: .25rem
+
+  input
+    width: 100%
