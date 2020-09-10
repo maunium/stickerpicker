@@ -54,8 +54,8 @@ class App extends Component {
 			frequentlyUsed: {
 				...this.state.frequentlyUsed,
 				stickerIDs,
-				stickers
-			}
+				stickers,
+			},
 		})
 		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
 	}
@@ -158,14 +158,27 @@ class App extends Component {
 			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
 				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="res/recent.svg" altOverride="🕓️" />
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
+				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="res/settings.svg" altOverride="⚙️️" />
 			</nav>
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
 				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
 				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
+				<${Settings} />
 			</div>
 		</main>`
 	}
 }
+
+const reload = () => window.location.reload()
+
+const Settings = () => html`
+	<section class="stickerpack settings" id="pack-settings" data-pack-id="settings">
+		<h1>Settings</h1>
+		<div class="settings-list">
+			<button onClick=${reload}>Reload</button>
+		</div>
+	</section>
+`
 
 // By default we just let the browser handle scrolling to sections, but webviews on Element iOS
 // open the link in the browser instead of just scrolling there, so we need to scroll manually:

@@ -82,3 +82,11 @@ div.sticker {
     object-fit: contain; }
     div.sticker > img.visible {
       display: initial; }
+
+div.settings-list {
+  display: flex; }
+  div.settings-list button {
+    width: 100%;
+    margin: .5rem;
+    padding: .5rem;
+    border-radius: .25rem; }
