@@ -41,6 +41,7 @@ class App extends Component {
 		this.navRef = null
 		this.sendSticker = this.sendSticker.bind(this)
 		this.navScroll = this.navScroll.bind(this)
+		this.reloadPacks = this.reloadPacks.bind(this)
 	}
 
 	_getStickersByID(ids) {
@@ -60,8 +61,16 @@ class App extends Component {
 		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
 	}
 
-	componentDidMount() {
-		fetch(`${PACKS_BASE_URL}/index.json`).then(async indexRes => {
+	reloadPacks() {
+		this.imageObserver.disconnect()
+		this.sectionObserver.disconnect()
+		this.setState({ packs: [] })
+		this._loadPacks(true)
+	}
+
+	_loadPacks(disableCache = false) {
+		const cache = disableCache ? "no-cache" : undefined
+		fetch(`${PACKS_BASE_URL}/index.json`, { cache }).then(async indexRes => {
 			if (indexRes.status >= 400) {
 				this.setState({
 					loading: false,
@@ -73,7 +82,7 @@ class App extends Component {
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
-				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`)
+				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
 				const packData = await packRes.json()
 				for (const sticker of packData.stickers) {
 					this.stickersByID.set(sticker.id, sticker)
@@ -85,7 +94,10 @@ class App extends Component {
 			}
 			this.updateFrequentlyUsed()
 		}, error => this.setState({ loading: false, error }))
+	}
 
+	componentDidMount() {
+		this._loadPacks()
 		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
 			rootMargin: "100px",
 		})
@@ -118,6 +130,9 @@ class App extends Component {
 	}
 
 	componentDidUpdate() {
+		if (this.packListRef === null) {
+			return
+		}
 		for (const elem of this.packListRef.getElementsByClassName("sticker")) {
 			this.imageObserver.observe(elem)
 		}
@@ -163,19 +178,17 @@ class App extends Component {
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
 				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
 				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
-				<${Settings} />
+				<${Settings} app=${this}/>
 			</div>
 		</main>`
 	}
 }
 
-const reload = () => isMobileSafari ? (window.location.href = window.location.href) : window.location.reload()
-
-const Settings = () => html`
+const Settings = ({ app }) => html`
 	<section class="stickerpack settings" id="pack-settings" data-pack-id="settings">
 		<h1>Settings</h1>
 		<div class="settings-list">
-			<button onClick=${reload}>Reload</button>
+			<button onClick=${app.reloadPacks}>Reload</button>
 		</div>
 	</section>
 `
