@@ -153,9 +153,9 @@ class App extends Component {
 			}
 		}
 		if (minXElem !== null) {
-			minXElem.scrollIntoView({ inline: "start", behavior: "smooth" })
+			minXElem.scrollIntoView({ inline: "start" })
 		} else if (maxXElem !== null) {
-			maxXElem.scrollIntoView({ inline: "end", behavior: "instant" })
+			maxXElem.scrollIntoView({ inline: "end" })
 		}
 	}
 
