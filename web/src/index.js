@@ -43,6 +43,8 @@ class App extends Component {
 		this.sendSticker = this.sendSticker.bind(this)
 		this.navScroll = this.navScroll.bind(this)
 		this.reloadPacks = this.reloadPacks.bind(this)
+		this.observeSectionIntersections = this.observeSectionIntersections.bind(this)
+		this.observeImageIntersections = this.observeImageIntersections.bind(this)
 	}
 
 	_getStickersByID(ids) {
@@ -129,14 +131,31 @@ class App extends Component {
 	}
 
 	observeSectionIntersections(intersections) {
+		const navWidth = this.navRef.getBoundingClientRect().width
+		let minX = 0, maxX = navWidth
+		let minXElem = null
+		let maxXElem = null
 		for (const entry of intersections) {
 			const packID = entry.target.getAttribute("data-pack-id")
 			const navElement = document.getElementById(`nav-${packID}`)
 			if (entry.isIntersecting) {
 				navElement.classList.add("visible")
+				const bb = navElement.getBoundingClientRect()
+				if (bb.x < minX) {
+					minX = bb.x
+					minXElem = navElement
+				} else if (bb.right > maxX) {
+					maxX = bb.right
+					maxXElem = navElement
+				}
 			} else {
 				navElement.classList.remove("visible")
 			}
+		}
+		if (minXElem !== null) {
+			minXElem.scrollIntoView({ inline: "start", behavior: "smooth" })
+		} else if (maxXElem !== null) {
+			maxXElem.scrollIntoView({ inline: "end", behavior: "instant" })
 		}
 	}
 
