@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "snowpack": "snowpack",
-    "sass": "node-sass -o style style/*.sass"
+    "sass": "node-sass -o style style/*.sass --output-style compressed"
   },
   "snowpack": {
     "install": [
