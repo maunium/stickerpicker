@@ -169,7 +169,7 @@ class App extends Component {
 	}
 }
 
-const reload = () => window.location.reload()
+const reload = () => isMobileSafari ? (window.location.href = window.location.href) : window.location.reload()
 
 const Settings = () => html`
 	<section class="stickerpack settings" id="pack-settings" data-pack-id="settings">
