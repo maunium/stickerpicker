@@ -30,7 +30,7 @@ This requires logging in with your account instead of a bot token.
        "stickerpicker": {
            "content": {
                "type": "m.stickerpicker",
-               "url": "https://your.sticker.picker.url/index.html",
+               "url": "https://your.sticker.picker.url/?theme=$theme",
                "name": "Stickerpicker",
                "data": {}
            },
@@ -44,6 +44,9 @@ This requires logging in with your account instead of a bot token.
 
     If you do not yet have a `m.widgets` event, simply create it with that content.
     You can also [use the client-server API directly][1] instead of using Element Web.
+
+    The `theme=$theme` query parameter will make the widget conform to Element's theme automatically.
+    You can also use `light`, `dark` or `black` instead of `$theme` to always use a specific theme.
 3. Open the sticker picker and enjoy the fast sticker picking experience.
 
 [1]: https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type

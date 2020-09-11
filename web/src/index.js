@@ -20,20 +20,35 @@ const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${
 // This is also used to fix scrolling to sections on Element iOS
 const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
 
+export const parseQuery = str => Object.fromEntries(
+	str.split("&")
+		.map(part => part.split("="))
+		.map(([key, value = ""]) => [key, value]))
+
+const supportedThemes = ["light", "dark", "black"]
+
 class App extends Component {
 	constructor(props) {
 		super(props)
+		this.defaultTheme = parseQuery(location.search.substr(1)).theme
 		this.state = {
 			packs: [],
 			loading: true,
 			error: null,
 			stickersPerRow: parseInt(localStorage.mauStickersPerRow || "4"),
+			theme: localStorage.mauStickerThemeOverride || this.defaultTheme,
 			frequentlyUsed: {
 				id: "frequently-used",
 				title: "Frequently used",
 				stickerIDs: frequent.get(),
 				stickers: [],
 			},
+		}
+		if (!supportedThemes.includes(this.state.theme)) {
+			this.state.theme = "light"
+		}
+		if (!supportedThemes.includes(this.defaultTheme)) {
+			this.defaultTheme = "light"
 		}
 		this.stickersByID = new Map(JSON.parse(localStorage.mauFrequentlyUsedStickerCache || "[]"))
 		this.state.frequentlyUsed.stickers = this._getStickersByID(this.state.frequentlyUsed.stickerIDs)
@@ -71,6 +86,16 @@ class App extends Component {
 			stickersPerRow: val,
 		})
 		this.packListRef.scrollTop = this.packListRef.scrollHeight
+	}
+
+	setTheme(theme) {
+		if (theme === "default") {
+			delete localStorage.mauStickerThemeOverride
+			this.setState({ theme: this.defaultTheme })
+		} else {
+			localStorage.mauStickerThemeOverride = theme
+			this.setState({ theme: theme })
+		}
 	}
 
 	reloadPacks() {
@@ -189,21 +214,22 @@ class App extends Component {
 	}
 
 	render() {
+		const theme = `theme-${this.state.theme}`
 		if (this.state.loading) {
-			return html`<main class="spinner"><${Spinner} size=${80} green /></main>`
+			return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`
 		} else if (this.state.error) {
-			return html`<main class="error">
+			return html`<main class="error ${theme}">
 				<h1>Failed to load packs</h1>
 				<p>${this.state.error}</p>
 			</main>`
 		} else if (this.state.packs.length === 0) {
-			return html`<main class="empty"><h1>No packs found 😿</h1></main>`
+			return html`<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`
 		}
-		return html`<main class="has-content">
+		return html`<main class="has-content ${theme}">
 			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
-				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="res/recent.svg" altOverride="🕓️" />
+				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
-				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="res/settings.svg" altOverride="⚙️️" />
+				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
 			</nav>
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
 				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
@@ -225,6 +251,15 @@ const Settings = ({ app }) => html`
 					value=${app.state.stickersPerRow}
 					onInput=${evt => app.setStickersPerRow(evt.target.value)} />
 			</div>
+			<div>
+				<label for="theme">Theme: </label>
+				<select name="theme" id="theme" onChange=${evt => app.setTheme(evt.target.value)}>
+					<option value="default">Default</option>
+					<option value="light">Light</option>
+					<option value="dark">Dark</option>
+					<option value="black">Black</option>
+				</select>
+			</div>
 		</div>
 	</section>
 `
@@ -237,12 +272,12 @@ const scrollToSection = (evt, id) => {
 	evt.preventDefault()
 }
 
-const NavBarItem = ({ pack, iconOverride = null, altOverride = null }) => html`
+const NavBarItem = ({ pack, iconOverride = null }) => html`
 	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}
 	   onClick=${isMobileSafari ? (evt => scrollToSection(evt, pack.id)) : undefined}>
-		<div class="sticker ${iconOverride ? "icon" : ""}">
+		<div class="sticker">
 			${iconOverride ? html`
-				<img src=${iconOverride} alt=${altOverride} class="visible"/>
+				<span class="icon icon-${iconOverride}"/>
 			` : html`
 				<img src=${makeThumbnailURL(pack.stickers[0].url)}
 					alt=${pack.stickers[0].body} class="visible" />

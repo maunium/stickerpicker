@@ -23,6 +23,8 @@ $nav-height: calc(#{$nav-sticker-size} + #{$nav-bottom-highlight})
 $nav-height-inverse: calc(-#{$nav-sticker-size} - #{$nav-bottom-highlight})
 
 main
+  color: var(--text-color)
+
   &.spinner
     margin-top: 5rem
 
@@ -42,25 +44,49 @@ main
     display: grid
     grid-template-rows: $nav-height auto
 
+main.theme-light
+  --highlight-color: #eee
+  --text-color: black
+  background-color: white
+
+main.theme-dark
+  --highlight-color: #444
+  --text-color: white
+  background-color: #22262e
+
+main.theme-black
+  --highlight-color: #222
+  --text-color: white
+  background-color: black
+
+.icon
+  width: 100%
+  height: 100%
+  background-color: var(--text-color)
+  mask-size: contain
+  -webkit-mask-size: contain
+  mask-image: var(--icon-image)
+  -webkit-mask-image: var(--icon-image)
+
+  &.icon-settings
+    --icon-image: url(../res/settings.svg)
+
+  &.icon-recent
+    --icon-image: url(../res/recent.svg)
+
 nav
   display: flex
   overflow-x: auto
 
-  height: $nav-height
-
-  background-color: white
-
   > a
     border-bottom: $nav-bottom-highlight solid transparent
+
     &.visible
       border-bottom-color: green
+
     > div.sticker
       width: $nav-sticker-size
       height: $nav-sticker-size
-    > div.sticker.icon > img
-      width: 70%
-      height: 70%
-      padding: 15%
 
 div.pack-list, nav
   scrollbar-width: none
@@ -99,7 +125,7 @@ div.sticker
   box-sizing: border-box
 
   &:hover
-    background-color: #eee
+    background-color: var(--highlight-color)
 
   > img
     display: none
@@ -108,6 +134,11 @@ div.sticker
 
     &.visible
       display: initial
+
+  > .icon
+    width: 70%
+    height: 70%
+    margin: 15%
 
 div.settings-list
   display: flex
