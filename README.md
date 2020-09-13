@@ -83,3 +83,6 @@ Notes:
 
 ### Element Android
 ![Element Android](preview-element-android.png)
+
+### Element iOS (dark theme)
+![Element iOS](preview-element-ios.png)
