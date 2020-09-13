@@ -42,7 +42,7 @@ async def main(args: argparse.Namespace) -> None:
     else:
         old_stickers = {sticker["id"]: sticker for sticker in pack["stickers"]}
         pack["stickers"] = []
-    for file in os.listdir(args.path):
+    for file in sorted(os.listdir(args.path)):
         if file.startswith("."):
             continue
         path = os.path.join(args.path, file)
@@ -60,6 +60,12 @@ async def main(args: argparse.Namespace) -> None:
             continue
         print(f"Processing {file}", end="", flush=True)
         name = os.path.splitext(file)[0]
+
+        # If the name starts with "number-", remove the prefix
+        name_split = name.split("-", 1)
+        if len(name_split) == 2 and name_split[0].isdecimal():
+            name = name_split[1]
+
         sticker_id = f"sha256:{sha256(image_data).hexdigest()}"
         print(".", end="", flush=True)
         if sticker_id in old_stickers:

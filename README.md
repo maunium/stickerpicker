@@ -36,6 +36,8 @@ Notes:
 1. Create a directory with your sticker images.
    * The file name (excluding extension) will be used as the caption.
    * The directory name will be used as the pack name/ID.
+   * If you want the stickers to appear in a specific order, prefix them with `<number>-`,
+     e.g. `01-Cat.png`. The number and dash won't be included in the caption.
 2. Run `sticker-pack <pack directory>`.
    * If you want to override the pack displayname, pass `--title <custom title>`.
 3. Copy `<pack directory>/pack.json` to `web/packs/your-pack-name.json`.
