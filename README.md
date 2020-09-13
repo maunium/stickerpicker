@@ -68,6 +68,9 @@ Notes:
 
     The `theme=$theme` query parameter will make the widget conform to Element's theme automatically.
     You can also use `light`, `dark` or `black` instead of `$theme` to always use a specific theme.
+
+    You can use https://maunium.net/stickers-demo/ as the URL to try out the picker
+    without hosting the files yourself.
 3. Open the sticker picker and enjoy the fast sticker picking experience.
 
 [1]: https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
