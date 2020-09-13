@@ -3,6 +3,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+from typing import Dict, Optional
 from hashlib import sha256
 import argparse
 import os.path
@@ -21,6 +22,50 @@ def convert_name(name: str) -> str:
     }
     allowed_chars = string.ascii_letters + string.digits + "_-/.#"
     return "".join(filter(lambda char: char in allowed_chars, name.translate(name_translate)))
+
+
+async def upload_sticker(file: str, directory: str, old_stickers: Dict[str, matrix.StickerInfo]
+                         ) -> Optional[matrix.StickerInfo]:
+    if file.startswith("."):
+        return None
+    path = os.path.join(directory, file)
+    if not os.path.isfile(path):
+        return None
+    mime = magic.from_file(path, mime=True)
+    if not mime.startswith("image/"):
+        return None
+
+    print(f"Processing {file}", end="", flush=True)
+    try:
+        with open(path, "rb") as image_file:
+            image_data = image_file.read()
+    except Exception as e:
+        print(f"... failed to read file: {e}")
+        return None
+    name = os.path.splitext(file)[0]
+
+    # If the name starts with "number-", remove the prefix
+    name_split = name.split("-", 1)
+    if len(name_split) == 2 and name_split[0].isdecimal():
+        name = name_split[1]
+
+    sticker_id = f"sha256:{sha256(image_data).hexdigest()}"
+    print(".", end="", flush=True)
+    if sticker_id in old_stickers:
+        sticker = {
+            **old_stickers[sticker_id],
+            "body": name,
+        }
+        print(f".. using existing upload")
+    else:
+        image_data, width, height = util.convert_image(image_data)
+        print(".", end="", flush=True)
+        mxc = await matrix.upload(image_data, "image/png", file)
+        print(".", end="", flush=True)
+        sticker = util.make_sticker(mxc, width, height, len(image_data), name)
+        sticker["id"] = sticker_id
+        print(" uploaded", flush=True)
+    return sticker
 
 
 async def main(args: argparse.Namespace) -> None:
@@ -42,58 +87,34 @@ async def main(args: argparse.Namespace) -> None:
     else:
         old_stickers = {sticker["id"]: sticker for sticker in pack["stickers"]}
         pack["stickers"] = []
+
     for file in sorted(os.listdir(args.path)):
-        if file.startswith("."):
-            continue
-        path = os.path.join(args.path, file)
-        if not os.path.isfile(path):
-            continue
-        mime = magic.from_file(path, mime=True)
-        if not mime.startswith("image/"):
-            continue
-
-        try:
-            with open(path, "rb") as image_file:
-                image_data = image_file.read()
-        except Exception as e:
-            print(f"Failed to read {file}: {e}")
-            continue
-        print(f"Processing {file}", end="", flush=True)
-        name = os.path.splitext(file)[0]
-
-        # If the name starts with "number-", remove the prefix
-        name_split = name.split("-", 1)
-        if len(name_split) == 2 and name_split[0].isdecimal():
-            name = name_split[1]
-
-        sticker_id = f"sha256:{sha256(image_data).hexdigest()}"
-        print(".", end="", flush=True)
-        if sticker_id in old_stickers:
-            pack["stickers"].append({
-                **old_stickers[sticker_id],
-                "body": name,
-            })
-            print(f".. using existing upload")
-        else:
-            image_data, width, height = util.convert_image(image_data)
-            print(".", end="", flush=True)
-            mxc = await matrix.upload(image_data, "image/png", file)
-            print(".", end="", flush=True)
-            sticker = util.make_sticker(mxc, width, height, len(image_data), name)
-            sticker["id"] = sticker_id
+        sticker = await upload_sticker(file, args.path, old_stickers=old_stickers)
+        if sticker:
             pack["stickers"].append(sticker)
-            print(" uploaded", flush=True)
+
     with open(meta_path, "w") as pack_file:
         json.dump(pack, pack_file)
     print(f"Wrote pack to {meta_path}")
+
+    if args.add_to_index:
+        picker_file_name = f"{pack['id']}.json"
+        picker_pack_path = os.path.join(args.add_to_index, picker_file_name)
+        with open(picker_pack_path, "w") as pack_file:
+            json.dump(pack, pack_file)
+        print(f"Copied pack to {picker_pack_path}")
+        util.add_to_index(picker_file_name, args.add_to_index)
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config",
                     help="Path to JSON file with Matrix homeserver and access_token",
-                    type=str, default="config.json")
-parser.add_argument("--title", help="Override the sticker pack displayname", type=str)
-parser.add_argument("--id", help="Override the sticker pack ID", type=str)
+                    type=str, default="config.json", metavar="file")
+parser.add_argument("--title", help="Override the sticker pack displayname", type=str,
+                    metavar="title")
+parser.add_argument("--id", help="Override the sticker pack ID", type=str, metavar="id")
+parser.add_argument("--add-to-index", help="Sticker picker pack directory (usually 'web/packs/')",
+                    type=str, metavar="path")
 parser.add_argument("path", help="Path to the sticker pack directory", type=str)
 
 
