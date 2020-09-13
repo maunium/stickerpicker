@@ -36,17 +36,20 @@ Notes:
 1. Create a directory with your sticker images.
    * The file name (excluding extension) will be used as the caption.
    * The directory name will be used as the pack name/ID.
-   * If you want the stickers to appear in a specific order, prefix them with `<number>-`,
-     e.g. `01-Cat.png`. The number and dash won't be included in the caption.
+   * If you want the stickers to appear in a specific order, prefix them with
+     `number-`, e.g. `01-Cat.png`. The number and dash won't be included in the
+     caption.
 2. Run `sticker-pack <pack directory>`.
    * If you want to override the pack displayname, pass `--title <custom title>`.
-3. Copy `<pack directory>/pack.json` to `web/packs/your-pack-name.json`.
-4. Add `your-pack-name.json` to the list in `web/packs/index.json`.
+   * Pass `--add-to-index web/packs/` if you want to automatically add the
+     generated pack to your sticker picker.
 
 ## Enabling the sticker widget
-1. Serve everything under `web/` using your webserver of choice. Make sure not to serve the
-   top-level data, as `config.json` and the Telethon session file contain sensitive data.
-2. Using `/devtools` in Element Web, edit the `m.widgets` account data event to have the following content:
+1. Serve everything under `web/` using your webserver of choice. Make sure not
+   to serve the top-level data, as `config.json` and the Telethon session file
+   contain sensitive data.
+2. Using `/devtools` in Element Web, edit the `m.widgets` account data event to
+   have the following content:
 
    ```json
    {
@@ -68,11 +71,12 @@ Notes:
     If you do not yet have a `m.widgets` event, simply create it with that content.
     You can also [use the client-server API directly][1] instead of using Element Web.
 
-    The `theme=$theme` query parameter will make the widget conform to Element's theme automatically.
-    You can also use `light`, `dark` or `black` instead of `$theme` to always use a specific theme.
+    The `theme=$theme` query parameter will make the widget conform to Element's
+    theme automatically. You can also use `light`, `dark` or `black` instead of
+    `$theme` to always use a specific theme.
 
-    You can use https://maunium.net/stickers-demo/ as the URL to try out the picker
-    without hosting the files yourself.
+    You can use https://maunium.net/stickers-demo/ as the URL to try out the
+    picker without hosting the files yourself.
 3. Open the sticker picker and enjoy the fast sticker picking experience.
 
 [1]: https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-user-userid-account-data-type
