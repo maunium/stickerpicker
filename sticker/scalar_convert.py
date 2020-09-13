@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 import sys
 import json
 
-index_path = "web/packs/index.json"
+index_path = "../web/packs/index.json"
 
 try:
     with open(index_path) as index_file:
@@ -18,7 +17,7 @@ for pack in data["assets"]:
     if "images" not in pack["data"]:
         print(f"Skipping {title}")
         continue
-    id = f"scalar-{pack['asset_id']}"
+    pack_id = f"scalar-{pack['asset_id']}"
     stickers = []
     for sticker in pack["data"]["images"]:
         sticker_data = sticker["content"]
@@ -26,7 +25,7 @@ for pack in data["assets"]:
         stickers.append(sticker_data)
     pack_data = {
         "title": title,
-        "id": id,
+        "id": pack_id,
         "stickers": stickers,
     }
     filename = f"scalar-{pack['name'].replace(' ', '_')}.json"

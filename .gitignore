@@ -4,6 +4,7 @@
 /env
 *.pyc
 __pycache__
+*.egg-info
 
 node_modules
 

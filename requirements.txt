@@ -3,3 +3,4 @@ yarl
 pillow
 telethon
 cryptg
+python-magic
