@@ -5,13 +5,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from typing import Dict, Optional
 from hashlib import sha256
+import mimetypes
 import argparse
 import os.path
 import asyncio
 import string
 import json
 
-import magic
+try:
+    import magic
+except ImportError:
+    print("[Warning] Magic is not installed, using file extensions to guess mime types")
+    magic = None
 
 from .lib import matrix, util
 
@@ -31,7 +36,11 @@ async def upload_sticker(file: str, directory: str, old_stickers: Dict[str, matr
     path = os.path.join(directory, file)
     if not os.path.isfile(path):
         return None
-    mime = magic.from_file(path, mime=True)
+
+    if magic:
+        mime = magic.from_file(path, mime=True)
+    else:
+        mime, _ = mimetypes.guess_type(file)
     if not mime.startswith("image/"):
         return None
 
