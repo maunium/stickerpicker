@@ -11,6 +11,15 @@ For setup and usage instructions, please visit the [wiki](https://github.com/mau
 * [Enabling the widget](https://github.com/maunium/stickerpicker/wiki/Enabling-the-widget)
 * [Hosting on GitHub pages](https://github.com/maunium/stickerpicker/wiki/Hosting-on-GitHub-pages)
 
+## Comparison with other sticker pickers
+
+| Feature                  | Scalar | Dimension | Maunium sticker picker |
+|--------------------------|--------|-----------|------------------------|
+| Free software            | ❌     | ✔️         | ✔️                     |
+| Custom sticker packs     | ❌     | ✔️         | ✔️                     |
+| Telegram import          | ❌     | ✔️         | ✔️                     |
+| Works on Element mobiles | ✔️     | ❌         | ✔️                     |
+
 ## Preview
 ### Element Web
 ![Element Web](preview-element-web.png)
