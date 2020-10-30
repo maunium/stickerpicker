@@ -13,12 +13,16 @@ For setup and usage instructions, please visit the [wiki](https://github.com/mau
 
 ## Comparison with other sticker pickers
 
-| Feature                  | Scalar | Dimension | Maunium sticker picker |
-|--------------------------|--------|-----------|------------------------|
-| Free software            | ❌     | ✔️         | ✔️                     |
-| Custom sticker packs     | ❌     | ✔️         | ✔️                     |
-| Telegram import          | ❌     | ✔️         | ✔️                     |
-| Works on Element mobiles | ✔️     | ❌         | ✔️                     |
+| Feature                         | Scalar | Dimension | Maunium sticker picker |
+|---------------------------------|--------|-----------|------------------------|
+| Free software                   | ❌     | ✔️        | ✔️                     |
+| Custom sticker packs            | ❌     | ✔️        | ✔️                     |
+| Telegram import                 | ❌     | ✔️        | ✔️                     |
+| Works on Element mobiles        | ✔️     | ❌        | ✔️                     |
+| Easy multi-user setup           | ✔️     | ✔️        | ❌<sup>[#7][#7]</sup>  |
+| Frequently used stickers at top | ❌     | ❌        | ✔️                     |
+
+[#7]: https://github.com/maunium/stickerpicker/issues/7
 
 ## Preview
 ### Element Web
