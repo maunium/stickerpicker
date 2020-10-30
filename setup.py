@@ -27,7 +27,7 @@ setuptools.setup(
 
     classifiers=[
         "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Framework :: AsyncIO",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
