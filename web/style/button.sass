@@ -1,0 +1,60 @@
+// maunium-stickerpicker - A fast and simple Matrix sticker picker widget.
+// Copyright (C) 2020 Tulir Asokan
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+@import theme.sass
+
+button.mau-button
+  cursor: pointer
+  margin: .5rem 0
+  border-radius: .25rem
+  font-size: 1rem
+  box-sizing: border-box
+  padding: 0
+
+  &:disabled
+    cursor: default
+
+  &.size-thick
+    height: 3rem
+
+  &.size-normal
+    height: 2.5rem
+
+  &.size-thin
+    height: 2rem
+
+  &.variant-filled
+    background-color: $primary
+    color: $primaryContrastText
+    border: none
+
+    &:hover
+      background-color: $primaryDark
+
+    &:disabled
+      background-color: $disabled
+      color: $text
+
+  &.variant-outlined
+    background-color: $background
+    border: 2px solid $primary
+    color: $primary
+
+    &:hover
+      background-color: $primaryLight
+
+    &:disabled
+      background-color: $background
+      border-color: $disabled

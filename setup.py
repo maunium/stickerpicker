@@ -5,6 +5,19 @@ from sticker.get_version import git_tag, git_revision, version, linkified_versio
 with open("requirements.txt") as reqs:
     install_requires = reqs.read().splitlines()
 
+with open("optional-requirements.txt") as reqs:
+    extras_require = {}
+    current = []
+    for line in reqs.read().splitlines():
+        if line.startswith("#/"):
+            extras_require[line[2:]] = current = []
+        elif not line or line.startswith("#"):
+            continue
+        else:
+            current.append(line)
+
+extras_require["all"] = list({dep for deps in extras_require.values() for dep in deps})
+
 try:
     long_desc = open("README.md").read()
 except IOError:
@@ -34,6 +47,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
 
     install_requires=install_requires,
+    extras_require=extras_require,
     python_requires="~=3.6",
 
     classifiers=[
@@ -45,9 +59,17 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     entry_points={"console_scripts": [
         "sticker-import=sticker.import:cmd",
         "sticker-pack=sticker.pack:cmd",
+        "sticker-server=sticker.server:cmd",
     ]},
+    package_data={"sticker.server": [
+        "example-config.yaml",
+
+        "frontend/index.html", "frontend/setup/index.html",
+        "frontend/src/*", "frontend/lib/*/*.js", "frontend/res/*", "frontend/style/*.css",
+    ]}
 )

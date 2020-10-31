@@ -13,8 +13,9 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { html, render, Component } from "../lib/htm/preact.js"
-import { Spinner } from "./spinner.js"
+import { html, render, Component } from "../../lib/htm/preact.js"
+
+import Spinner from "../Spinner.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"
 
@@ -24,23 +25,25 @@ const PACKS_BASE_URL = "packs"
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
+// eslint-disable-next-line max-len
 const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
 // This is also used to fix scrolling to sections on Element iOS
-const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
+const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/)
+	&& navigator.userAgent.match(/AppleWebKit/)
 
-export const parseQuery = str => Object.fromEntries(
-	str.split("&")
-		.map(part => part.split("="))
-		.map(([key, value = ""]) => [key, value]))
+const query = Object.fromEntries(location.search
+	.substr(1).split("&")
+	.map(part => part.split("="))
+	.map(([key, value = ""]) => [key, value]))
 
 const supportedThemes = ["light", "dark", "black"]
 
 class App extends Component {
 	constructor(props) {
 		super(props)
-		this.defaultTheme = parseQuery(location.search.substr(1)).theme
+		this.defaultTheme = query.theme
 		this.state = {
 			packs: [],
 			loading: true,
@@ -61,7 +64,8 @@ class App extends Component {
 			this.defaultTheme = "light"
 		}
 		this.stickersByID = new Map(JSON.parse(localStorage.mauFrequentlyUsedStickerCache || "[]"))
-		this.state.frequentlyUsed.stickers = this._getStickersByID(this.state.frequentlyUsed.stickerIDs)
+		this.state.frequentlyUsed.stickers = this._getStickersByID(
+			this.state.frequentlyUsed.stickerIDs)
 		this.imageObserver = null
 		this.packListRef = null
 		this.navRef = null
@@ -86,12 +90,14 @@ class App extends Component {
 				stickers,
 			},
 		})
-		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
+		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(
+			stickers.map(sticker => [sticker.id, sticker]))
 	}
 
 	setStickersPerRow(val) {
 		localStorage.mauStickersPerRow = val
-		document.documentElement.style.setProperty("--stickers-per-row", localStorage.mauStickersPerRow)
+		document.documentElement.style.setProperty("--stickers-per-row",
+			localStorage.mauStickersPerRow)
 		this.setState({
 			stickersPerRow: val,
 		})
@@ -116,20 +122,34 @@ class App extends Component {
 	}
 
 	_loadPacks(disableCache = false) {
-		const cache = disableCache ? "no-cache" : undefined
-		fetch(`${PACKS_BASE_URL}/index.json`, { cache }).then(async indexRes => {
+		const args = {
+			cache: disableCache ? "no-cache" : undefined,
+			headers: query.user_id && query.token ? {
+				Authorization: `Bearer ${query.token}`,
+				"X-Matrix-User-ID": query.user_id,
+			} : {},
+		}
+		fetch(`${PACKS_BASE_URL}/index.json`, args).then(async indexRes => {
 			if (indexRes.status >= 400) {
-				this.setState({
-					loading: false,
-					error: indexRes.status !== 404 ? indexRes.statusText : null,
-				})
+				try {
+					const errData = await indexRes.json()
+					this.setState({
+						loading: false,
+						error: errData.error,
+					})
+				} catch (err) {
+					this.setState({
+						loading: false,
+						error: indexRes.status !== 404 ? indexRes.statusText : null,
+					})
+				}
 				return
 			}
 			const indexData = await indexRes.json()
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
-				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
+				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, args)
 				const packData = await packRes.json()
 				for (const sticker of packData.stickers) {
 					this.stickersByID.set(sticker.id, sticker)
@@ -140,11 +160,15 @@ class App extends Component {
 				})
 			}
 			this.updateFrequentlyUsed()
-		}, error => this.setState({ loading: false, error }))
+		}, error => this.setState({
+			loading: false,
+			error,
+		}))
 	}
 
 	componentDidMount() {
-		document.documentElement.style.setProperty("--stickers-per-row", this.state.stickersPerRow.toString())
+		document.documentElement.style.setProperty("--stickers-per-row",
+			this.state.stickersPerRow.toString())
 		this._loadPacks()
 		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
 			rootMargin: "100px",
@@ -226,27 +250,37 @@ class App extends Component {
 	render() {
 		const theme = `theme-${this.state.theme}`
 		if (this.state.loading) {
-			return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`
+			return html`
+				<main class="spinner ${theme}">
+					<${Spinner} size=${80} green />
+				</main>`
 		} else if (this.state.error) {
-			return html`<main class="error ${theme}">
-				<h1>Failed to load packs</h1>
-				<p>${this.state.error}</p>
-			</main>`
+			return html`
+				<main class="error ${theme}">
+					<h1>Failed to load packs</h1>
+					<p>${this.state.error}</p>
+				</main>`
 		} else if (this.state.packs.length === 0) {
-			return html`<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`
+			return html`
+				<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`
 		}
-		return html`<main class="has-content ${theme}">
-			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
-				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
-				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
-				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
-			</nav>
-			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
-				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
-				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
-				<${Settings} app=${this}/>
-			</div>
-		</main>`
+		return html`
+			<main class="has-content ${theme}">
+				<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
+					<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
+					${this.state.packs.map(pack => html`
+						<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
+					<${NavBarItem} pack=${{ id: "settings", title: "Settings" }}
+								   iconOverride="settings" />
+				</nav>
+				<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}"
+					 ref=${elem => this.packListRef = elem}>
+					<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker}/>
+						${this.state.packs.map(pack => html`
+							<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker}/>`)}
+						<${Settings} app=${this}/>
+				</div>
+			</main>`
 	}
 }
 
@@ -257,9 +291,9 @@ const Settings = ({ app }) => html`
 			<button onClick=${app.reloadPacks}>Reload</button>
 			<div>
 				<label for="stickers-per-row">Stickers per row: ${app.state.stickersPerRow}</label>
-				<input type="range" min=2 max=10 id="stickers-per-row" id="stickers-per-row"
-					value=${app.state.stickersPerRow}
-					onInput=${evt => app.setStickersPerRow(evt.target.value)} />
+				<input type="range" min=2 max=10 id="stickers-per-row"
+					   value=${app.state.stickersPerRow}
+					   onInput=${evt => app.setStickersPerRow(evt.target.value)}/>
 			</div>
 			<div>
 				<label for="theme">Theme: </label>
@@ -278,25 +312,34 @@ const Settings = ({ app }) => html`
 // open the link in the browser instead of just scrolling there, so we need to scroll manually:
 const scrollToSection = (evt, id) => {
 	const pack = document.getElementById(`pack-${id}`)
-	pack.scrollIntoView({ block: "start", behavior: "instant" })
+	pack.scrollIntoView({
+		block: "start",
+		behavior: "instant",
+	})
 	evt.preventDefault()
 }
 
-const NavBarItem = ({ pack, iconOverride = null }) => html`
+const NavBarItem = ({
+	pack,
+	iconOverride = null,
+}) => html`
 	<a href="#pack-${pack.id}" id="nav-${pack.id}" data-pack-id=${pack.id} title=${pack.title}
-	   onClick=${isMobileSafari ? (evt => scrollToSection(evt, pack.id)) : undefined}>
+	   onClick=${isMobileSafari ? evt => scrollToSection(evt, pack.id) : undefined}>
 		<div class="sticker">
 			${iconOverride ? html`
-				<span class="icon icon-${iconOverride}"/>
+				<span class="icon icon-${iconOverride}" />
 			` : html`
 				<img src=${makeThumbnailURL(pack.stickers[0].url)}
-					alt=${pack.stickers[0].body} class="visible" />
+					 alt=${pack.stickers[0].body} class="visible" />
 			`}
 		</div>
 	</a>
 `
 
-const Pack = ({ pack, send }) => html`
+const Pack = ({
+	pack,
+	send,
+}) => html`
 	<section class="stickerpack" id="pack-${pack.id}" data-pack-id=${pack.id}>
 		<h1>${pack.title}</h1>
 		<div class="sticker-list">
@@ -307,9 +350,12 @@ const Pack = ({ pack, send }) => html`
 	</section>
 `
 
-const Sticker = ({ content, send }) => html`
+const Sticker = ({
+	content,
+	send,
+}) => html`
 	<div class="sticker" onClick=${send} data-sticker-id=${content.id}>
-		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
+		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body}/>
 	</div>
 `
 

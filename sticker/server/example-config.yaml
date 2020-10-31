@@ -1,0 +1,74 @@
+# Postgres database URL for storing sticker packs and other things.
+database: postgres://username:password@hostname/dbname
+
+# Settings for the actual HTTP server
+server:
+    # The IP and port to listen to.
+    hostname: 0.0.0.0
+    port: 29329
+    # Public base URL where the server is visible.
+    public_url: https://example.com
+    # Override path from where to load UI resources.
+    # Set to false to using pkg_resources to find the path.
+    override_resource_path: false
+    # Whether or not to trust X-Forwarded-For headers for determining the request IP.
+    trust_forward_headers: false
+
+# Telegram configuration for downloading sticker packs. In the future, this will be client-side and
+# none of this configuration will be necessary.
+telegram_import:
+    # Create your own bot at https://t.me/BotFather
+    bot_token: null
+
+    # Matrix homeserver access details. This is only used for uploading Telegram-imported stickers.
+    homeserver:
+        address: https://example.com
+        access_token: null
+
+# Permissions for who is allowed to use the sticker picker.
+#
+# Values are objects that should contain boolean values each permission:
+#             access - Access the sticker picker and use existing packs.
+#       create_packs - Create packs by uploading images.
+#    telegram_import - Create packs by importing from Telegram. Images are stored on
+#
+# Permission keys may be user IDs, server names or "*". If a server name or user ID permission
+# doesn't specify some keys, they'll be inherited from the higher level.
+permissions:
+    "*":
+        access: true
+        create_packs: true
+        telegram_import: false
+    "example.com":
+        telegram_import: true
+
+# Python logging configuration.
+#
+# See Configuration dictionary schema in the Python documentation for more info:
+# https://docs.python.org/3.9/library/logging.config.html#configuration-dictionary-schema
+logging:
+    version: 1
+    formatters:
+        colored:
+            (): mautrix.util.logging.ColorFormatter
+            format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+        normal:
+            format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+    handlers:
+        file:
+            class: logging.handlers.RotatingFileHandler
+            formatter: normal
+            filename: ./sticker.server.log
+            maxBytes: 10485760
+            backupCount: 10
+        console:
+            class: logging.StreamHandler
+            formatter: colored
+    loggers:
+        mau:
+            level: DEBUG
+        aiohttp:
+            level: INFO
+    root:
+        level: DEBUG
+        handlers: [file, console]

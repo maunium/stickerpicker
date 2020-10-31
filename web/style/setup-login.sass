@@ -1,0 +1,105 @@
+// maunium-stickerpicker - A fast and simple Matrix sticker picker widget.
+// Copyright (C) 2020 Tulir Asokan
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+@import theme.sass
+
+main.login-view
+  position: fixed
+  top: 0
+  bottom: 0
+  right: 0
+  left: 0
+  background-color: $primary
+  display: flex
+  justify-content: space-around
+
+  form.login-box
+    background-color: $background
+    width: 25rem
+    height: 22.5rem
+    padding: 2.5rem 2.5rem 2rem
+    margin-top: 3rem
+    border-radius: .25rem
+    box-sizing: border-box
+    display: flex
+    flex-direction: column
+
+    &.has-error
+      min-height: 27rem
+      height: auto
+      margin-bottom: auto
+
+    h1
+      color: $primary
+      margin: .5rem auto 3rem
+      font-size: 1.5rem
+
+    .input
+      margin: .5rem 0
+      border-radius: .25rem
+      border: 1px solid $border
+      padding: 1px
+
+      &:hover, &:focus, &.focus
+        border-color: $primary
+
+      &:focus, &.focus
+        border-width: 2px
+        padding: 0
+
+    .username
+      display: flex
+      cursor: text
+
+      & > input
+        border: none
+        padding: .75rem .125rem
+        color: $text
+        min-width: 0
+        font-size: 1rem
+
+        &:last-of-type
+          padding-right: .5rem
+          border-radius: 0 .25rem .25rem 0
+
+        &:focus
+          outline: none
+
+      & > span
+        user-select: none
+        padding: .75rem 0
+        color: $text
+
+        &:first-of-type
+          padding-left: .5rem
+
+    .password
+      @include input
+
+    .button-group
+      display: flex
+      gap: 4px
+
+      button
+        width: 100%
+
+    .error
+      padding: 1rem
+      border-radius: .25rem
+      border: 2px solid $errorDark
+      background-color: $error
+      margin: .5rem 0
+      width: 100%
+      box-sizing: border-box

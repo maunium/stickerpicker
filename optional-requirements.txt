@@ -1,0 +1,10 @@
+# Format: #/name defines a new extras_require group called name
+# Uncommented lines after the group definition insert things into that group.
+
+#/server
+mautrix==0.8.0rc4
+asyncpg>=0.20,<0.22
+attrs
+setuptools
+aiodns
+ruamel.yaml

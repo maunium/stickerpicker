@@ -12,3 +12,5 @@ web/lib/import-map.json
 *.session
 /*.json
 *.bak
+*.log
+config.yaml

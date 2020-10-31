@@ -117,6 +117,8 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
 pack_url_regex = re.compile(r"^(?:(?:https?://)?(?:t|telegram)\.(?:me|dog)/addstickers/)?"
                             r"([A-Za-z0-9-_]+)"
                             r"(?:\.json)?$")
+api_id = 298751
+api_hash = "cb676d6bae20553c9996996a8f52b4d7"
 
 parser = argparse.ArgumentParser()
 
@@ -132,7 +134,7 @@ parser.add_argument("pack", help="Sticker pack URLs to import", action="append",
 
 async def main(args: argparse.Namespace) -> None:
     await matrix.load_config(args.config)
-    client = TelegramClient(args.session, 298751, "cb676d6bae20553c9996996a8f52b4d7")
+    client = TelegramClient(args.session, api_id, api_hash)
     await client.start()
 
     if args.list:

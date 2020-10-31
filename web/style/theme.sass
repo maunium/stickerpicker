@@ -1,0 +1,33 @@
+// Material UI green 800
+$primary: #2e7d32
+$primaryDark: #005005
+$primaryLight: #60ad5e
+// Material UI blue 700
+$secondary: #1976d2
+$secondaryDark: #004ba0
+$secondaryLight: #63a4ff
+
+$error: #F7A9A1
+$errorDark: #B71C1C
+
+$primaryContrastText: white
+$background: white
+$text: #212121
+$border: #DDD
+$disabled: #CCC
+
+@mixin input
+  font-size: 1rem
+  margin: .5rem 0
+  border-radius: .25rem
+  border: 1px solid $border
+  padding: calc(.75rem + 1px) 1rem
+  box-sizing: border-box
+
+  &:hover:not(:disabled), &:focus:not(:disabled)
+    border-color: $primary
+
+  &:focus
+    padding: .75rem calc(1rem - 1px)
+    border-width: 2px
+    outline: none

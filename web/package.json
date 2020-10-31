@@ -12,7 +12,8 @@
   },
   "snowpack": {
     "install": [
-      "htm/preact"
+      "htm/preact",
+      "preact/hooks"
     ],
     "installOptions": {
       "sourceMap": false,
@@ -22,10 +23,15 @@
   },
   "dependencies": {
     "htm": "^3.0.4",
-    "preact": "^10.4.8",
-    "snowpack": "^2.10.3"
+    "preact": "^10.5.5",
+    "snowpack": "^2.16.1"
   },
   "devDependencies": {
-    "node-sass": "^4.14.1"
+    "@babel/core": "^7.12.3",
+    "@babel/eslint-parser": "^7.12.1",
+    "eslint": "^7.12.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "node-sass": "^5.0.0"
   }
 }
