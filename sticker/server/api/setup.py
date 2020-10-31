@@ -13,7 +13,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 from aiohttp import web
 
+from ..database import User, AccessToken
+
 routes = web.RouteTableDef()
+
+
+@routes.get("/whoami")
+async def whoami(req: web.Request) -> web.Response:
+    user: User = req["user"]
+    token: AccessToken = req["token"]
+    return web.json_response({
+        "id": user.id,
+        "widget_secret": user.widget_secret,
+        "homeserver_url": user.homeserver_url,
+        "last_seen": int(token.last_seen_date.timestamp() / 60) * 60,
+    })

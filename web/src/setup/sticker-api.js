@@ -13,8 +13,22 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { html, render } from "../../lib/htm/preact.js"
 
-import App from "./App.js"
+import { tryFetch as tryFetchDefault, setupPrefix } from "./tryGet.js"
 
-render(html`<${App} />`, document.body)
+const service = "setup API"
+
+const tryFetch = (url, options, reqInfo) => {
+	if (!options.headers?.Authorization) {
+		if (!options.headers) {
+			options.headers = {}
+		}
+		options.headers.Authorization = `Bearer ${localStorage.stickerSetupAccessToken}`
+	}
+	return tryFetchDefault(url, options, reqInfo)
+}
+
+export const whoami = () => tryFetch(
+	`${setupPrefix}/whoami`,
+	{}, { service, requestType: "whoami" },
+)

@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 import { tryFetch, integrationPrefix } from "./tryGet.js"
 
 export const resolveWellKnown = async (server) => {
@@ -41,7 +40,7 @@ export const getLoginFlows = async (address) => {
 	return flows
 }
 
-export const loginMatrix = async (address, authInfo) => {
+export const login = async (address, authInfo) => {
 	const data = await tryFetch(`${address}/_matrix/client/r0/login`, {
 		method: "POST",
 		body: JSON.stringify({
@@ -66,6 +65,17 @@ export const loginMatrix = async (address, authInfo) => {
 	}
 	return [data.access_token, data.user_id, address]
 }
+
+export const whoami = (address, accessToken) => tryFetch(
+	`${address}/_matrix/client/r0/account/whoami`,
+	{
+		headers: { Authorization: `Bearer ${accessToken}` },
+	},
+	{
+		service: address,
+		requestType: "whoami",
+	},
+)
 
 export const requestOpenIDToken = (address, userID, accessToken) => tryFetch(
 	`${address}/_matrix/client/r0/user/${userID}/openid/request_token`,

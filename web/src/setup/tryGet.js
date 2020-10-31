@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 export const integrationPrefix = "../_matrix/integrations/v1"
+export const setupPrefix = "api"
 
 export const queryToURL = (url, query) => {
 	if (!Array.isArray(query)) {
@@ -26,14 +26,18 @@ export const queryToURL = (url, query) => {
 	return url
 }
 
+class MatrixError extends Error {
+	constructor(data, status) {
+		super(data.error)
+		this.code = data.errcode
+		this.httpStatus = status
+	}
+}
+
 export const tryFetch = async (url, options, reqInfo) => {
 	if (options.query) {
 		url = queryToURL(url, options.query)
 		delete options.query
-	}
-	options.headers = {
-		Authorization: `Bearer ${localStorage.accessToken}`,
-		...options.headers,
 	}
 	const reqName = `${reqInfo.service} ${reqInfo.requestType}`
 	let resp
@@ -59,7 +63,9 @@ export const tryFetch = async (url, options, reqInfo) => {
 		console.error(reqName, "request JSON parse failed:", err)
 		throw new Error(`Invalid response from ${reqInfo.service}`)
 	}
-	if (resp.status >= 400) {
+	if (data.error && data.errcode) {
+		throw new MatrixError(data, resp.status)
+	} else if (resp.status >= 400) {
 		console.error("Unexpected", reqName, "request status:", resp.status, data)
 		throw new Error(data.error || data.message || `Invalid response from ${reqInfo.service}`)
 	}

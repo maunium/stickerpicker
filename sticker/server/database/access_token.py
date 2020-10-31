@@ -37,7 +37,8 @@ class AccessToken(Base):
 
     @classmethod
     async def get(cls, token_id: int) -> Optional['AccessToken']:
-        q = "SELECT user_id, token_hash, last_seen_ip, last_seen_date FROM pack WHERE token_id=$1"
+        q = ("SELECT user_id, token_hash, last_seen_ip, last_seen_date "
+             "FROM access_token WHERE token_id=$1")
         row: asyncpg.Record = await cls.db.fetchrow(q, token_id)
         if row is None:
             return None
@@ -48,7 +49,7 @@ class AccessToken(Base):
                                         == datetime.now().replace(second=0, microsecond=0)):
             # Same IP and last seen on this minute, skip update
             return
-        q = ("UPDATE access_token SET last_seen_ip=$3, last_seen_date=current_timestamp "
+        q = ("UPDATE access_token SET last_seen_ip=$2, last_seen_date=current_timestamp "
              "WHERE token_id=$1 RETURNING last_seen_date")
         self.last_seen_date = await self.db.fetchval(q, self.token_id, ip)
         self.last_seen_ip = ip

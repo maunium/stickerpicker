@@ -16,13 +16,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "../../lib/preact/hooks.js"
 import { html } from "../../lib/htm/preact.js"
 
-import {
-	getLoginFlows,
-	loginMatrix,
-	requestIntegrationToken,
-	requestOpenIDToken,
-	resolveWellKnown,
-} from "./matrix-api.js"
+import * as matrix from "./matrix-api.js"
 import Button from "../Button.js"
 import Spinner from "../Spinner.js"
 
@@ -87,11 +81,11 @@ const LoginView = ({ onLoggedIn }) => {
 			previousServerValue.current = server
 			setSupportedFlows(null)
 			setError(null)
-			resolveWellKnown(server).then(url => {
+			matrix.resolveWellKnown(server).then(url => {
 				setServerURL(url)
 				localStorage.mxServerName = server
 				localStorage.mxHomeserver = url
-				return getLoginFlows(url)
+				return matrix.getLoginFlows(url)
 			}).then(flows => {
 				setSupportedFlows(flows)
 			}).catch(err => {
@@ -135,15 +129,13 @@ const LoginView = ({ onLoggedIn }) => {
 		}
 		try {
 			const actualServerURL = serverURLOverride || serverURL
-			const [accessToken, userID, realURL] = await loginMatrix(actualServerURL, authInfo)
-			console.log(userID, realURL)
-			const openIDToken = await requestOpenIDToken(realURL, userID, accessToken)
-			console.log(openIDToken)
-			const integrationData = await requestIntegrationToken(openIDToken)
-			console.log(integrationData)
+			const [accessToken, userID, realURL] = await matrix.login(actualServerURL, authInfo)
+			const openIDToken = await matrix.requestOpenIDToken(realURL, userID, accessToken)
+			const integrationData = await matrix.requestIntegrationToken(openIDToken)
+			localStorage.mxHomeserver = realURL
 			localStorage.mxAccessToken = accessToken
 			localStorage.mxUserID = userID
-			localStorage.accessToken = integrationData.token
+			localStorage.stickerSetupAccessToken = integrationData.token
 			onLoggedIn()
 		} catch (err) {
 			setError(err.message)
