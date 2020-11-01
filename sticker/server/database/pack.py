@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import List, Dict, Any
+import json
 
 from attr import dataclass
 
@@ -35,15 +36,20 @@ class Pack(Base):
 
     async def insert(self) -> None:
         await self.db.execute("INSERT INTO pack (id, owner, title, meta) VALUES ($1, $2, $3, $4)",
-                              self.id, self.owner, self.title, self.meta)
+                              self.id, self.owner, self.title, json.dumps(self.meta))
+
+    @classmethod
+    def from_data(cls, **data: Any) -> 'Pack':
+        meta = json.loads(data.pop("meta"))
+        return cls(**data, meta=meta)
 
     async def get_stickers(self) -> List[Sticker]:
         res = await self.db.fetch('SELECT id, url, body, meta, "order" '
                                   'FROM sticker WHERE pack_id=$1 ORDER BY "order"', self.id)
-        return [Sticker(**row, pack_id=self.id) for row in res]
+        return [Sticker.from_data(**row, pack_id=self.id) for row in res]
 
     async def set_stickers(self, stickers: List[Sticker]) -> None:
-        data = ((sticker.id, self.id, sticker.url, sticker.body, sticker.meta, order)
+        data = ((sticker.id, self.id, sticker.url, sticker.body, json.dumps(sticker.meta), order)
                 for order, sticker in enumerate(stickers))
         columns = ["id", "pack_id", "url", "body", "meta", "order"]
         async with self.db.acquire() as conn, conn.transaction():

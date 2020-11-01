@@ -13,7 +13,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Dict
+from typing import Dict, Optional
+from collections import deque
 import json
 
 from aiohttp import web
@@ -98,6 +99,14 @@ class _ErrorMeta:
     def pack_not_found(self) -> web.HTTPException:
         return web.HTTPNotFound(**self._make_error("NET.MAUNIUM_PACK_NOT_FOUND",
                                                    "Sticker pack not found"))
+
+    def schema_error(self, message: str, path: Optional[deque] = None) -> web.HTTPException:
+        if path:
+            path_str = "in " + " → ".join(str(part) for part in path)
+        else:
+            path_str = "at top level"
+        return web.HTTPBadRequest(**self._make_error(
+            "M_BAD_REQUEST", f"Schema validation error {path_str}: {message}"))
 
     @property
     def client_well_known_error(self) -> web.HTTPException:

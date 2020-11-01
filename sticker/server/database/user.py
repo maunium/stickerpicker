@@ -16,6 +16,7 @@
 from typing import Optional, List, ClassVar
 import random
 import string
+import time
 
 from attr import dataclass
 import asyncpg
@@ -76,7 +77,7 @@ class User(Base):
         res = await self.db.fetch("SELECT id, owner, title, meta FROM user_pack "
                                   "LEFT JOIN pack ON pack.id=user_pack.pack_id "
                                   'WHERE user_id=$1 ORDER BY "order"', self.id)
-        return [Pack(**row) for row in res]
+        return [Pack.from_data(**row) for row in res]
 
     async def get_pack(self, pack_id: str) -> Optional[Pack]:
         row = await self.db.fetchrow("SELECT id, owner, title, meta FROM user_pack "
@@ -84,7 +85,7 @@ class User(Base):
                                      "WHERE user_id=$1 AND pack_id=$2", self.id, pack_id)
         if row is None:
             return None
-        return Pack(**row)
+        return Pack.from_data(**row)
 
     async def set_packs(self, packs: List[Pack]) -> None:
         data = ((self.id, pack.id, order)
@@ -93,3 +94,11 @@ class User(Base):
         async with self.db.acquire() as conn, conn.transaction():
             await conn.execute("DELETE FROM user_pack WHERE user_id=$1", self.id)
             await conn.copy_records_to_table("user_pack", records=data, columns=columns)
+
+    async def add_pack(self, pack: Pack) -> None:
+        q = 'INSERT INTO user_pack (user_id, pack_id, "order") VALUES ($1, $2, $3)'
+        await self.db.execute(q, self.id, pack.id, int(time.time()))
+
+    async def remove_pack(self, pack: Pack) -> None:
+        q = "DELETE FROM user_pack WHERE user_id=$1 AND pack_id=$2"
+        await self.db.execute(q, self.id, pack.id)

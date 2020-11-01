@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Dict, Any
+import json
 
 from attr import dataclass
 import attr
@@ -26,19 +27,11 @@ from .base import Base
 @dataclass(kw_only=True)
 class Sticker(Base):
     pack_id: str
-    order: int
+    order: int = 0
     id: str
     url: ContentURI = attr.ib(order=False)
     body: str = attr.ib(order=False)
     meta: Dict[str, Any] = attr.ib(order=False)
-
-    async def delete(self) -> None:
-        await self.db.execute("DELETE FROM sticker WHERE id=$1", self.id)
-
-    async def insert(self) -> None:
-        await self.db.execute('INSERT INTO sticker (id, pack_id, url, body, meta, "order") '
-                              "VALUES ($1, $2, $3, $4, $5, $6)",
-                              self.id, self.pack_id, self.url, self.body, self.meta, self.order)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -47,3 +40,8 @@ class Sticker(Base):
             "url": self.url,
             "id": self.id,
         }
+
+    @classmethod
+    def from_data(cls, **data: Any) -> 'Sticker':
+        meta = json.loads(data.pop("meta"))
+        return cls(**data, meta=meta)

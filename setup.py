@@ -71,5 +71,5 @@ setuptools.setup(
 
         "frontend/index.html", "frontend/setup/index.html",
         "frontend/src/*", "frontend/lib/*/*.js", "frontend/res/*", "frontend/style/*.css",
-    ]}
+    ], "sticker.server.api": ["pack.schema.json"]}
 )

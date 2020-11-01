@@ -47,10 +47,11 @@ async def upgrade_v1(conn: Connection) -> None:
         PRIMARY KEY (user_id, pack_id)
     )""")
     await conn.execute("""CREATE TABLE sticker (
-        id      TEXT  PRIMARY KEY,
-        pack_id TEXT  NOT NULL REFERENCES pack(id) ON DELETE CASCADE,
+        id      TEXT,
+        pack_id TEXT  REFERENCES pack(id) ON DELETE CASCADE,
         url     TEXT  NOT NULL,
         body    TEXT  NOT NULL,
         meta    JSONB NOT NULL,
-        "order" INT   NOT NULL DEFAULT 0
+        "order" INT   NOT NULL DEFAULT 0,
+        PRIMARY KEY (id, pack_id)
     )""")

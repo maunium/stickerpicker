@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "A sticker pack compatible with maunium-stickerpicker",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "An unique identifier for the sticker pack",
+      "readOnly": true
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the sticker pack"
+    },
+    "stickers": {
+      "type": "array",
+      "description": "The stickers in the pack",
+      "items": {
+        "type": "object",
+        "description": "A single sticker",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "An unique identifier for the sticker"
+          },
+          "url": {
+            "type": "string",
+            "description": "The Matrix content URI to the sticker",
+            "pattern": "mxc://.+?/.+"
+          },
+          "body": {
+            "type": "string",
+            "description": "The description text for the sticker"
+          },
+          "info": {
+            "type": "object",
+            "description": "Matrix media info",
+            "properties": {
+              "w": {
+                "type": "integer",
+                "description": "The intended display width of the sticker"
+              },
+              "h": {
+                "type": "integer",
+                "description": "The intended display height of the sticker"
+              },
+              "size": {
+                "type": "integer",
+                "description": "The size of the sticker image in bytes"
+              },
+              "mimetype": {
+                "type": "string",
+                "description": "The mime type of the sticker image"
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "w",
+              "h",
+              "size",
+              "mimetype"
+            ]
+          },
+          "net.maunium.telegram.sticker": {
+            "type": "object",
+            "description": "Telegram metadata about the sticker",
+            "properties": {
+              "pack": {
+                "type": "string",
+                "description": "Information about the pack the sticker is in",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The ID of the sticker pack"
+                  },
+                  "short_name": {
+                    "type": "string",
+                    "description": "The short name of the Telegram sticker pack from t.me/addstickers/<shortname>"
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "description": "The ID of the sticker document"
+              },
+              "emoticons": {
+                "type": "array",
+                "description": "Emojis that are associated with the sticker",
+                "items": {
+                  "type": "string",
+                  "description": "A single unicode emoji"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "body",
+          "info"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "net.maunium.telegram.pack": {
+      "type": "object",
+      "description": "Telegram metadata about the pack",
+      "properties": {
+        "short_name": {
+          "type": "string",
+          "description": "The short name of the Telegram sticker pack from t.me/addstickers/<shortname>"
+        },
+        "hash": {
+          "type": "string",
+          "description": "The Telegram-specified hash of the stickerpack that can be used to quickly check if it has changed"
+        }
+      }
+    }
+  },
+  "additionalProperties": true,
+  "required": [
+    "title",
+    "stickers"
+  ]
+}

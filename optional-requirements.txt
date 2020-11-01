@@ -8,3 +8,4 @@ attrs
 setuptools
 aiodns
 ruamel.yaml
+jsonschema
