@@ -32,6 +32,11 @@ main.empty {
   text-align: center
 }
 
+div.search-empty {
+  margin: 1rem;
+  text-align: center
+}
+
 main.has-content {
   position: fixed;
   top: 0;
@@ -39,23 +44,26 @@ main.has-content {
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-rows: calc(12vw + 2px) auto
+  grid-template-rows: calc(12vw + 2px) min-content auto
 }
 
 main.theme-light {
   --highlight-color: #eee;
+  --search-box-color: var(--highlight-color);
   --text-color: black;
   background-color: white
 }
 
 main.theme-dark {
   --highlight-color: #444;
+  --search-box-color: #383e4b;
   --text-color: white;
   background-color: #22262e
 }
 
 main.theme-black {
   --highlight-color: #222;
+  --search-box-color: var(--highlight-color);
   --text-color: white;
   background-color: black
 }
@@ -76,6 +84,10 @@ main.theme-black {
 
 .icon.icon-recent {
   --icon-image: url(../res/recent.svg)
+}
+
+.icon.icon-search {
+  --icon-image: url(../res/search.svg)
 }
 
 nav {
@@ -112,7 +124,7 @@ div.pack-list {
 
 div.pack-list.ios-safari-hack {
   position: fixed;
-  top: calc(12vw + 2px);
+  top: calc(12vw + 2 * .7rem + 2 * 1rem + 2px);
   bottom: 0;
   left: 0;
   right: 0;
@@ -160,6 +172,33 @@ div.sticker>.icon {
   width: 70%;
   height: 70%;
   margin: 15%
+}
+
+div.search-box {
+  position: relative;
+  display: flex;
+}
+
+div.search-box>input[type="text"] {
+  flex-grow: 1;
+  background-color: var(--search-box-color);
+  outline: none;
+  border: none;
+  border-radius: .25rem;
+  padding: .7rem 1.8rem .7rem .7rem;
+  margin: .5rem;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+div.search-box>span.icon {
+  display: flex;
+  position: absolute;
+  right: 1rem;
+  top: calc(50% - .5rem);
+  width: 1rem;
+  height: 1rem;
+  box-sizing: border-box;
 }
 
 div.settings-list {
