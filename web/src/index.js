@@ -309,7 +309,7 @@ const Pack = ({ pack, send }) => html`
 
 const Sticker = ({ content, send }) => html`
 	<div class="sticker" onClick=${send} data-sticker-id=${content.id}>
-		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} />
+		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} title=${content.body} />
 	</div>
 `
 
