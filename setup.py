@@ -47,7 +47,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
     ],
     entry_points={"console_scripts": [
-        "sticker-import=sticker.import:cmd",
+        "sticker-import=sticker.stickerimport:cmd",
         "sticker-pack=sticker.pack:cmd",
     ]},
 )
