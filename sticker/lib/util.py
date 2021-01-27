@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from functools import partial
 from io import BytesIO
 import os.path
 import json
@@ -21,6 +22,7 @@ from PIL import Image
 
 from . import matrix
 
+open_utf8 = partial(open, encoding='UTF-8')
 
 def convert_image(data: bytes) -> (bytes, int, int):
     image: Image.Image = Image.open(BytesIO(data)).convert("RGBA")
@@ -41,7 +43,7 @@ def convert_image(data: bytes) -> (bytes, int, int):
 def add_to_index(name: str, output_dir: str) -> None:
     index_path = os.path.join(output_dir, "index.json")
     try:
-        with open(index_path) as index_file:
+        with open_utf8(index_path) as index_file:
             index_data = json.load(index_file)
     except (FileNotFoundError, json.JSONDecodeError):
         index_data = {"packs": []}
@@ -49,7 +51,7 @@ def add_to_index(name: str, output_dir: str) -> None:
         index_data["homeserver_url"] = matrix.homeserver_url
     if name not in index_data["packs"]:
         index_data["packs"].append(name)
-        with open(index_path, "w") as index_file:
+        with open_utf8(index_path, "w") as index_file:
             json.dump(index_data, index_file, indent="  ")
         print(f"Added {name} to {index_path}")
 
