@@ -71,7 +71,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
 
     already_uploaded = {}
     try:
-        with util.open_utf8(pack_path, encoding="utf-8") as pack_file:
+        with util.open_utf8(pack_path) as pack_file:
             existing_pack = json.load(pack_file)
             already_uploaded = {int(sticker["net.maunium.telegram.sticker"]["id"]): sticker
                                 for sticker in existing_pack["stickers"]}
