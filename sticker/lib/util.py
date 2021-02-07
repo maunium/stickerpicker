@@ -74,4 +74,5 @@ def make_sticker(mxc: str, width: int, height: int, size: int,
                 "mimetype": "image/png",
             },
         },
+        "msgtype": "m.sticker",
     }

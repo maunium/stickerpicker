@@ -42,6 +42,7 @@ if TYPE_CHECKING:
         url: str
         info: MediaInfo
         id: str
+        msgtype: str
 else:
     MediaInfo = None
     StickerInfo = None
