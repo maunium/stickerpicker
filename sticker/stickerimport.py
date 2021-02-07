@@ -138,11 +138,12 @@ async def main(args: argparse.Namespace) -> None:
     if args.list:
         stickers: AllStickers = await client(GetAllStickersRequest(hash=0))
         index = 1
-        width = len(str(stickers.sets))
+        width = len(str(len(stickers.sets)))
         print("Your saved sticker packs:")
         for saved_pack in stickers.sets:
             print(f"{index:>{width}}. {saved_pack.title} "
                   f"(t.me/addstickers/{saved_pack.short_name})")
+            index += 1
     elif args.pack[0]:
         input_packs = []
         for pack_url in args.pack[0]:
