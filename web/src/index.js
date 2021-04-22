@@ -220,7 +220,7 @@ class App extends Component {
 	}
 
 	navScroll(evt) {
-		this.navRef.scrollLeft += evt.deltaY * 12
+		this.navRef.scrollLeft += evt.deltaY
 	}
 
 	render() {
