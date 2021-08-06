@@ -1,0 +1,6 @@
+{
+  "packs": [
+    "Linerlys_Sticker_Pack.json"
+  ],
+  "homeserver_url": "https://matrix-client.matrix.org"
+}
