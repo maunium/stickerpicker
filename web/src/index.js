@@ -21,6 +21,14 @@ import * as frequent from "./frequently-used.js"
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
 const PACKS_BASE_URL = "packs"
+
+let INDEX = `${PACKS_BASE_URL}/index.json`;
+let params = new URLSearchParams(document.location.search);
+let REMOTE = false;
+if (params.has('config')) {
+	INDEX = params.get("config");
+	REMOTE = true;
+}
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
@@ -117,7 +125,7 @@ class App extends Component {
 
 	_loadPacks(disableCache = false) {
 		const cache = disableCache ? "no-cache" : undefined
-		fetch(`${PACKS_BASE_URL}/index.json`, { cache }).then(async indexRes => {
+		fetch(INDEX, { cache }).then(async indexRes => {
 			if (indexRes.status >= 400) {
 				this.setState({
 					loading: false,
@@ -129,7 +137,12 @@ class App extends Component {
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
-				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
+				let packRes;
+				if (REMOTE) {
+					packRes = await fetch(packFile, { cache })
+				} else {
+					packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
+				}
 				const packData = await packRes.json()
 				for (const sticker of packData.stickers) {
 					this.stickersByID.set(sticker.id, sticker)
