@@ -22,12 +22,10 @@ import * as frequent from "./frequently-used.js"
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
 const PACKS_BASE_URL = "packs"
 
-let INDEX = `${PACKS_BASE_URL}/index.json`;
-let params = new URLSearchParams(document.location.search);
-let REMOTE = false;
+let INDEX = `${PACKS_BASE_URL}/index.json`
+const params = new URLSearchParams(document.location.search)
 if (params.has('config')) {
-	INDEX = params.get("config");
-	REMOTE = true;
+	INDEX = params.get("config")
 }
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
@@ -137,8 +135,8 @@ class App extends Component {
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
-				let packRes;
-				if (REMOTE) {
+				let packRes
+				if (packFile.startsWith("https://") || packFile.startsWith("http://")) {
 					packRes = await fetch(packFile, { cache })
 				} else {
 					packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
