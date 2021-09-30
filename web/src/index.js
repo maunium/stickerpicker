@@ -36,17 +36,12 @@ const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${
 // This is also used to fix scrolling to sections on Element iOS
 const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
 
-export const parseQuery = str => Object.fromEntries(
-	str.split("&")
-		.map(part => part.split("="))
-		.map(([key, value = ""]) => [key, value]))
-
 const supportedThemes = ["light", "dark", "black"]
 
 class App extends Component {
 	constructor(props) {
 		super(props)
-		this.defaultTheme = parseQuery(location.search.substr(1)).theme
+		this.defaultTheme = params.get("theme")
 		this.state = {
 			packs: [],
 			loading: true,
