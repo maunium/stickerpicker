@@ -7,25 +7,13 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "snowpack": "snowpack",
-    "sass": "node-sass -o style style/*.sass --output-style compressed"
-  },
-  "snowpack": {
-    "install": [
-      "htm/preact"
-    ],
-    "installOptions": {
-      "sourceMap": false,
-      "dest": "lib",
-      "treeshake": true
-    }
+    "esinstall": "node ./esinstall.js",
+    "sass": "sass --no-source-map --style=compressed style/"
   },
   "dependencies": {
-    "htm": "^3.0.4",
-    "preact": "^10.4.8",
-    "snowpack": "^2.10.3"
-  },
-  "devDependencies": {
-    "node-sass": "^4.14.1"
+    "htm": "^3.1.0",
+    "preact": "^10.5.14",
+    "esinstall": "^1.1.7",
+    "sass": "^1.42.1"
   }
 }
