@@ -21,6 +21,12 @@ import * as frequent from "./frequently-used.js"
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
 const PACKS_BASE_URL = "packs"
+
+let INDEX = `${PACKS_BASE_URL}/index.json`
+const params = new URLSearchParams(document.location.search)
+if (params.has('config')) {
+	INDEX = params.get("config")
+}
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
@@ -30,17 +36,12 @@ const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${
 // This is also used to fix scrolling to sections on Element iOS
 const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
 
-export const parseQuery = str => Object.fromEntries(
-	str.split("&")
-		.map(part => part.split("="))
-		.map(([key, value = ""]) => [key, value]))
-
 const supportedThemes = ["light", "dark", "black"]
 
 class App extends Component {
 	constructor(props) {
 		super(props)
-		this.defaultTheme = parseQuery(location.search.substr(1)).theme
+		this.defaultTheme = params.get("theme")
 		this.state = {
 			packs: [],
 			loading: true,
@@ -117,7 +118,7 @@ class App extends Component {
 
 	_loadPacks(disableCache = false) {
 		const cache = disableCache ? "no-cache" : undefined
-		fetch(`${PACKS_BASE_URL}/index.json`, { cache }).then(async indexRes => {
+		fetch(INDEX, { cache }).then(async indexRes => {
 			if (indexRes.status >= 400) {
 				this.setState({
 					loading: false,
@@ -129,7 +130,12 @@ class App extends Component {
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
-				const packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
+				let packRes
+				if (packFile.startsWith("https://") || packFile.startsWith("http://")) {
+					packRes = await fetch(packFile, { cache })
+				} else {
+					packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
+				}
 				const packData = await packRes.json()
 				for (const sticker of packData.stickers) {
 					this.stickersByID.set(sticker.id, sticker)
