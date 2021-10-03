@@ -4,7 +4,7 @@
   "description": "A fast and simple Matrix sticker picker widget",
   "repository": "https://github.com/maunium/stickerpicker",
   "author": "Tulir Asokan <tulir@maunium.net>",
-  "license": "MPL-2.0",
+  "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "esinstall": "node ./esinstall.js",
