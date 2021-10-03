@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html, render, Component } from "../lib/htm/preact.js"
 import { Spinner } from "./spinner.js"
+import { SearchBox } from "./search-box.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"
 
@@ -38,12 +39,20 @@ const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && naviga
 
 const supportedThemes = ["light", "dark", "black"]
 
+const defaultState = {
+	packs: [],
+	filtering: {
+		searchTerm: "",
+		packs: [],
+	},
+}
+
 class App extends Component {
 	constructor(props) {
 		super(props)
 		this.defaultTheme = params.get("theme")
 		this.state = {
-			packs: [],
+			packs: defaultState.packs,
 			loading: true,
 			error: null,
 			stickersPerRow: parseInt(localStorage.mauStickersPerRow || "4"),
@@ -54,6 +63,7 @@ class App extends Component {
 				stickerIDs: frequent.get(),
 				stickers: [],
 			},
+			filtering: defaultState.filtering,
 		}
 		if (!supportedThemes.includes(this.state.theme)) {
 			this.state.theme = "light"
@@ -66,6 +76,7 @@ class App extends Component {
 		this.imageObserver = null
 		this.packListRef = null
 		this.navRef = null
+		this.searchStickers = this.searchStickers.bind(this)
 		this.sendSticker = this.sendSticker.bind(this)
 		this.navScroll = this.navScroll.bind(this)
 		this.reloadPacks = this.reloadPacks.bind(this)
@@ -90,6 +101,28 @@ class App extends Component {
 		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
 	}
 
+	searchStickers(e) {
+		const sanitizeString = s => s.toLowerCase().trim()
+		const searchTerm = sanitizeString(e.target.value)
+
+		const allPacks = [this.state.frequentlyUsed, ...this.state.packs]
+		const packsWithFilteredStickers = allPacks.map(pack => ({
+			...pack,
+			stickers: pack.stickers.filter(sticker =>
+				sanitizeString(sticker.body).includes(searchTerm) ||
+				sanitizeString(sticker.id).includes(searchTerm)
+			),
+		}))
+
+		this.setState({
+			filtering: {
+				...this.state.filtering,
+				searchTerm,
+				packs: packsWithFilteredStickers.filter(({ stickers }) => !!stickers.length),
+			},
+		})
+	}
+
 	setStickersPerRow(val) {
 		localStorage.mauStickersPerRow = val
 		document.documentElement.style.setProperty("--stickers-per-row", localStorage.mauStickersPerRow)
@@ -112,7 +145,10 @@ class App extends Component {
 	reloadPacks() {
 		this.imageObserver.disconnect()
 		this.sectionObserver.disconnect()
-		this.setState({ packs: [] })
+		this.setState({
+			packs: defaultState.packs,
+			filtering: defaultState.filtering,
+		})
 		this._loadPacks(true)
 	}
 
@@ -231,6 +267,9 @@ class App extends Component {
 
 	render() {
 		const theme = `theme-${this.state.theme}`
+		const filterActive = !!this.state.filtering.searchTerm
+		const packs = filterActive ? this.state.filtering.packs : [this.state.frequentlyUsed, ...this.state.packs]
+
 		if (this.state.loading) {
 			return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`
 		} else if (this.state.error) {
@@ -241,15 +280,17 @@ class App extends Component {
 		} else if (this.state.packs.length === 0) {
 			return html`<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`
 		}
+
 		return html`<main class="has-content ${theme}">
 			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
 				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
 			</nav>
+			<${SearchBox} onKeyUp=${this.searchStickers} />
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
-				<${Pack} pack=${this.state.frequentlyUsed} send=${this.sendSticker} />
-				${this.state.packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
+				${filterActive && packs.length === 0 ? html`<div class="search-empty"><h1>No stickers match your search</h1></div>` : null}
+				${packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
 				<${Settings} app=${this}/>
 			</div>
 		</main>`
