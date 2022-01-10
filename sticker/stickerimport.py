@@ -71,7 +71,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
 
     already_uploaded = {}
     try:
-        with open(pack_path) as pack_file:
+        with util.open_utf8(pack_path) as pack_file:
             existing_pack = json.load(pack_file)
             already_uploaded = {int(sticker["net.maunium.telegram.sticker"]["id"]): sticker
                                 for sticker in existing_pack["stickers"]}
@@ -99,7 +99,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
                 doc["body"] = sticker.emoticon
             doc["net.maunium.telegram.sticker"]["emoticons"].append(sticker.emoticon)
 
-    with open(pack_path, "w") as pack_file:
+    with util.open_utf8(pack_path, "w") as pack_file:
         json.dump({
             "title": pack.set.title,
             "id": f"tg-{pack.set.id}",
@@ -138,11 +138,12 @@ async def main(args: argparse.Namespace) -> None:
     if args.list:
         stickers: AllStickers = await client(GetAllStickersRequest(hash=0))
         index = 1
-        width = len(str(stickers.sets))
+        width = len(str(len(stickers.sets)))
         print("Your saved sticker packs:")
         for saved_pack in stickers.sets:
             print(f"{index:>{width}}. {saved_pack.title} "
                   f"(t.me/addstickers/{saved_pack.short_name})")
+            index += 1
     elif args.pack[0]:
         input_packs = []
         for pack_url in args.pack[0]:

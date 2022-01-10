@@ -93,7 +93,7 @@ async def main(args: argparse.Namespace) -> None:
     dirname = os.path.basename(os.path.abspath(args.path))
     meta_path = os.path.join(args.path, "pack.json")
     try:
-        with open(meta_path) as pack_file:
+        with util.open_utf8(meta_path) as pack_file:
             pack = json.load(pack_file)
             print(f"Loaded existing pack meta from {meta_path}")
     except FileNotFoundError:
@@ -112,14 +112,14 @@ async def main(args: argparse.Namespace) -> None:
         if sticker:
             pack["stickers"].append(sticker)
 
-    with open(meta_path, "w") as pack_file:
+    with util.open_utf8(meta_path, "w") as pack_file:
         json.dump(pack, pack_file)
     print(f"Wrote pack to {meta_path}")
 
     if args.add_to_index:
         picker_file_name = f"{pack['id']}.json"
         picker_pack_path = os.path.join(args.add_to_index, picker_file_name)
-        with open(picker_pack_path, "w") as pack_file:
+        with util.open_utf8(picker_pack_path, "w") as pack_file:
             json.dump(pack, pack_file)
         print(f"Copied pack to {picker_pack_path}")
         util.add_to_index(picker_file_name, args.add_to_index)

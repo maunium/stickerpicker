@@ -32,6 +32,12 @@ $nav-bottom-highlight: 2px
 $nav-height: calc(#{$nav-sticker-size} + #{$nav-bottom-highlight})
 $nav-height-inverse: calc(-#{$nav-sticker-size} - #{$nav-bottom-highlight})
 
+$search-box-icon-size: 1rem
+$search-box-input-height: 1rem
+$search-box-input-padding: .7rem
+$search-box-input-margin: .5rem
+$search-box-height: calc(2 * #{$search-box-input-padding} + 2 * #{$search-box-input-margin} + #{$search-box-input-height})
+
 main
   color: var(--text-color)
 
@@ -50,22 +56,24 @@ main
     left: 0
     right: 0
     bottom: 0
-
     display: grid
-    grid-template-rows: $nav-height auto
+    grid-template-rows: $nav-height min-content auto
 
 main.theme-light
   --highlight-color: #eee
+  --search-box-color: var(--highlight-color)
   --text-color: black
   background-color: white
 
 main.theme-dark
   --highlight-color: #444
+  --search-box-color: #383e4b
   --text-color: white
   background-color: #22262e
 
 main.theme-black
   --highlight-color: #222
+  --search-box-color: var(--highlight-color)
   --text-color: white
   background-color: black
 
@@ -83,6 +91,9 @@ main.theme-black
 
   &.icon-recent
     --icon-image: url(../res/recent.svg)
+
+  &.icon.icon-search
+    --icon-image: url(../res/search.svg)
 
 nav
   display: flex
@@ -109,11 +120,15 @@ div.pack-list
 
 div.pack-list.ios-safari-hack
   position: fixed
-  top: $nav-height
+  top: calc(#{$nav-height} + #{$search-box-height})
   bottom: 0
   left: 0
   right: 0
   -webkit-overflow-scrolling: touch
+
+div.search-empty
+  margin: 1.2rem
+  text-align: center
 
 section.stickerpack
   margin-top: .75rem
@@ -149,6 +164,32 @@ div.sticker
     width: 70%
     height: 70%
     margin: 15%
+
+div.search-box
+  position: relative
+  display: flex
+
+  >input[type="text"]
+    flex-grow: 1
+    background-color: var(--search-box-color)
+    outline: none
+    border: none
+    border-radius: .25rem
+    height: $search-box-input-height
+    padding: $search-box-input-padding
+    padding-right: calc(#{$search-box-icon-size} + #{$search-box-input-padding})
+    margin: $search-box-input-margin
+    font-size: 1rem
+    color: var(--text-color)
+
+  >span.icon
+    display: flex
+    position: absolute
+    top: calc(50% - #{$search-box-icon-size} / 2)
+    right: $search-box-icon-size
+    width: $search-box-icon-size
+    height: $search-box-icon-size
+    box-sizing: border-box
 
 div.settings-list
   display: flex
