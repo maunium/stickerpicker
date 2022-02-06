@@ -19,7 +19,6 @@ export function shouldAutofocusSearchBar() {
   return localStorage.mauAutofocusSearchBar === 'true'
 }
 
-const SEARCHBOX_CLASSNAME = 'search-box'
 
 export class SearchBox extends Component {
 	constructor(props) {
@@ -32,14 +31,6 @@ export class SearchBox extends Component {
 
 		this.search = this.search.bind(this)
 		this.clearSearch = this.clearSearch.bind(this)
-	}
-
-	componentDidMount() {
-		// required for firefox / webview usage in mobile clients
-		const inputInWebView = document.querySelector(`.${SEARCHBOX_CLASSNAME} input`)
-		if (inputInWebView && this.autofocus) {
-			setTimeout(() => inputInWebView.focus(), 100)
-		}
 	}
 
 	componentWillReceiveProps(props) {
@@ -67,11 +58,12 @@ export class SearchBox extends Component {
 		const iconToDisplay = `icon-${isEmpty ? 'search' : 'reset'}`
 
 		return html`
-			<div class=${SEARCHBOX_CLASSNAME}>
+			<div class="search-box">
 				<input
 					placeholder="Find stickers …"
 					value=${this.value}
 					onKeyUp=${this.search}
+					autofocus=${this.autofocus}
 				/>
 				<div class=${className} title=${title} onClick=${onClick}>
 					<span class="icon ${iconToDisplay}" />
