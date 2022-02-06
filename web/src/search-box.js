@@ -24,6 +24,13 @@ export function shouldAutofocusSearchBar() {
 	return localStorage.mauAutofocusSearchBar === 'true' && shouldDisplayAutofocusSearchBar()
 }
 
+export function focusSearchBar() {
+	const inputInWebView = document.querySelector('.search-box input')
+	if (inputInWebView && shouldAutofocusSearchBar()) {
+		inputInWebView.focus()
+	}
+}
+
 export class SearchBox extends Component {
 	constructor(props) {
 		super(props)
@@ -32,35 +39,13 @@ export class SearchBox extends Component {
 		this.value = props.value
 		this.onSearch = props.onSearch
 		this.onReset = props.onReset
-		this.hasBeenFocused = false
 
-		this.focusInput = this.focusInput.bind(this)
 		this.search = this.search.bind(this)
 		this.clearSearch = this.clearSearch.bind(this)
 	}
 
-	focusInput() {
-		const inputInWebView = document.querySelector('.search-box input')
-		if (inputInWebView && this.autofocus) {
-			inputInWebView.focus()
-			this.hasBeenFocused = true
-		}
-	}
-
 	componentDidMount() {
-		this.focusInput()
-	}
-
-	componentDidUpdate() {
-		// check if we're in an iframe (Element desktop)
-		if (window.self !== window.top) {
-			// check if the iframe is not closed
-			if (document.querySelector('.search-box').offsetParent === null) {
-				this.focusInput()
-			} else {
-				this.hasBeenFocused = false
-			}
-		}
+		focusSearchBar()
 	}
 
 	componentWillReceiveProps(props) {
