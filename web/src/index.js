@@ -41,7 +41,13 @@ const supportedThemes = ["light", "dark", "black"]
 
 const defaultState = {
 	packs: [],
+	loading: true,
+	error: null,
+}
+
+const defaultSearchState = {
 	searchTerm: null,
+	filteredPacks: null
 }
 
 class App extends Component {
@@ -50,8 +56,7 @@ class App extends Component {
 		this.defaultTheme = params.get("theme")
 		this.state = {
 			...defaultState,
-			loading: true,
-			error: null,
+			...defaultSearchState,
 			stickersPerRow: parseInt(localStorage.mauStickersPerRow || "4"),
 			theme: localStorage.mauStickerThemeOverride || this.defaultTheme,
 			frequentlyUsed: {
@@ -101,31 +106,24 @@ class App extends Component {
 	// Search
 
 	resetSearch() {
-		this.setState({ searchTerm: defaultState.searchTerm })
+		this.setState({ ...defaultSearchState })
 	}
 
-	searchStickers(e) {
-		if (e.key === "Escape") {
-			this.resetSearch()
-			return
-		}
-
+	searchStickers(searchTerm) {
 		const sanitizeString = s => s.toLowerCase().trim()
-		const searchTerm = sanitizeString(e.target.value)
+		const sanitizedSearch = sanitizeString(searchTerm)
 
 		const allPacks = [this.state.frequentlyUsed, ...this.state.packs]
 		const packsWithFilteredStickers = allPacks.map(pack => ({
 			...pack,
 			stickers: pack.stickers.filter(sticker =>
-				sanitizeString(sticker.body).includes(searchTerm) ||
-				sanitizeString(sticker.id).includes(searchTerm)
+				sanitizeString(sticker.body).includes(sanitizedSearch) ||
+				sanitizeString(sticker.id).includes(sanitizedSearch)
 			),
 		}))
+		const filteredPacks = packsWithFilteredStickers.filter(({ stickers }) => !!stickers.length)
 
-		this.setState({
-			filteredPacks: packsWithFilteredStickers.filter(({ stickers }) => !!stickers.length),
-			searchTerm,
-		})
+		this.setState({ searchTerm, filteredPacks })
 	}
 
 	// End search
@@ -284,8 +282,10 @@ class App extends Component {
 
 	render() {
 		const theme = `theme-${this.state.theme}`
-		const filterActive = !!this.state.searchTerm
+
+		const filterActive = !!this.state.filteredPacks
 		const packs = filterActive ? this.state.filteredPacks : [this.state.frequentlyUsed, ...this.state.packs]
+		const noPacksForSearch = filterActive && packs.length === 0
 
 		if (this.state.loading) {
 			return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`
@@ -304,9 +304,13 @@ class App extends Component {
 				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
 				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
 			</nav>
-			<${SearchBox} onKeyUp=${this.searchStickers} resetSearch=${this.resetSearch} value=${this.state.searchTerm} />
+			<${SearchBox}
+				value=${this.state.searchTerm}
+				onSearch=${this.searchStickers}
+				onReset=${this.resetSearch}
+			/>
 			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
-				${filterActive && packs.length === 0 ? html`<div class="search-empty"><h1>No stickers match your search</h1></div>` : null}
+				${noPacksForSearch ? html`<div class="search-empty"><h1>No stickers match your search</h1></div>` : null}
 				${packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
 				<${Settings} app=${this}/>
 			</div>

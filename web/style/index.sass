@@ -171,22 +171,32 @@ div.sticker
 div.search-box
   display: flex
   margin: $search-box-input-margin
+  padding: 0
   border-radius: .4rem
-  overflow: hidden
+  background-color: var(--search-box-color)
+  opacity: .5
+  transition: all .1s
+  border: 1px solid transparent
+
+  &:focus-within
+    opacity: 1
+    border: 1px solid var(--text-color)
+
+  &:not(:focus-within):hover
+    opacity: .7
 
   input,.icon-display
     color: var(--text-color)
-    opacity: .5
-    transition: opacity .1s
-    background-color: var(--search-box-color)
-
-    &:focus,&:focus+.icon-display
-      opacity: 1
+    outline: none
+    border: none
+    height: $search-box-input-height
+    margin: 0
+    padding: $search-box-input-padding
+    background-color: transparent
+    -webkit-tap-highlight-color: transparent
 
   .icon-display
-    padding: $search-box-input-padding
     width: $search-box-input-height
-    height: $search-box-input-height
 
     &.reset-click-zone
       cursor: pointer
@@ -198,12 +208,6 @@ div.search-box
 
   input
     flex-grow: 1
-    outline: none
-    border: none
-    margin: 0
-    padding: $search-box-input-padding
-    padding-right: 0
-    height: $search-box-input-height
     font-size: 1rem
 
 div.settings-list

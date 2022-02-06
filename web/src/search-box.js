@@ -13,27 +13,71 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { html } from "../lib/htm/preact.js"
+import { html, Component } from "../lib/htm/preact.js"
 
 export function shouldAutofocusSearchBar() {
   return localStorage.mauAutofocusSearchBar === 'true'
 }
 
-export const SearchBox = ({ onKeyUp, resetSearch, value }) => {
-	const autofocus = shouldAutofocusSearchBar()
+const SEARCHBOX_CLASSNAME = 'search-box'
 
-	const className = `icon-display ${value ? 'reset-click-zone' : null}`
-	const title = value ? 'Click to reset' : null
-	const onClick = value ? resetSearch : null
+export class SearchBox extends Component {
+	constructor(props) {
+		super(props)
 
-	const iconToDisplay = `icon-${!value ? 'search' : 'reset'}`
+		this.autofocus = shouldAutofocusSearchBar()
+		this.value = props.value
+		this.onSearch = props.onSearch
+		this.onReset = props.onReset
 
-	return html`
-		<div class="search-box">
-			<input value=${value} placeholder="Find stickers" onKeyUp=${onKeyUp} autoFocus=${autofocus} />
-			<div class=${className} title=${title} onClick=${onClick}>
-				<span class="icon ${iconToDisplay}" />
+		this.search = this.search.bind(this)
+		this.clearSearch = this.clearSearch.bind(this)
+	}
+
+	componentDidMount() {
+		// required for firefox / webview usage in mobile clients
+		const inputInWebView = document.querySelector(`.${SEARCHBOX_CLASSNAME} input`)
+		if (inputInWebView && this.autofocus) {
+			inputInWebView.focus()
+		}
+	}
+
+	componentWillReceiveProps(props) {
+		this.value = props.value
+	}
+
+	search(e) {
+		if (e.key === "Escape") {
+			this.clearSearch()
+			return
+		}
+		this.onSearch(e.target.value)
+	}
+
+	clearSearch() {
+		this.onReset()
+	}
+
+	render() {
+		const isEmpty = !this.value
+
+		const className = `icon-display ${isEmpty ? null : 'reset-click-zone'}`
+		const title = isEmpty ? null : 'Click to reset'
+		const onClick = isEmpty ? null : this.clearSearch
+		const iconToDisplay = `icon-${isEmpty ? 'search' : 'reset'}`
+
+		return html`
+			<div class=${SEARCHBOX_CLASSNAME}>
+				<input
+					placeholder="Find stickers …"
+					value=${this.value}
+					onKeyUp=${this.search}
+					autoFocus=${this.autofocus}
+				/>
+				<div class=${className} title=${title} onClick=${onClick}>
+					<span class="icon ${iconToDisplay}" />
+				</div>
 			</div>
-		</div>
-	`
+		`
+	}
 }
