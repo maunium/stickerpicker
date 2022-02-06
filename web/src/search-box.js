@@ -15,7 +15,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html } from "../lib/htm/preact.js"
 
+export function shouldAutofocusSearchBar() {
+  return localStorage.mauAutofocusSearchBar === 'true'
+}
+
 export const SearchBox = ({ onKeyUp, resetSearch, value }) => {
+	const autofocus = shouldAutofocusSearchBar()
+
 	const className = `icon-display ${value ? 'reset-click-zone' : null}`
 	const title = value ? 'Click to reset' : null
 	const onClick = value ? resetSearch : null
@@ -24,7 +30,7 @@ export const SearchBox = ({ onKeyUp, resetSearch, value }) => {
 
 	return html`
 		<div class="search-box">
-			<input value=${value} placeholder="Find stickers" onKeyUp=${onKeyUp} />
+			<input value=${value} placeholder="Find stickers" onKeyUp=${onKeyUp} autoFocus=${autofocus} />
 			<div class=${className} title=${title} onClick=${onClick}>
 				<span class="icon ${iconToDisplay}" />
 			</div>

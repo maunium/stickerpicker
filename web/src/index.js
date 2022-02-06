@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html, render, Component } from "../lib/htm/preact.js"
 import { Spinner } from "./spinner.js"
-import { SearchBox } from "./search-box.js"
+import { shouldAutofocusSearchBar, SearchBox } from "./search-box.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"
 
@@ -128,6 +128,10 @@ class App extends Component {
 		})
 	}
 
+	// End search
+
+	// Settings
+
 	setStickersPerRow(val) {
 		localStorage.mauStickersPerRow = val
 		document.documentElement.style.setProperty("--stickers-per-row", localStorage.mauStickersPerRow)
@@ -146,6 +150,12 @@ class App extends Component {
 			this.setState({ theme: theme })
 		}
 	}
+
+	setAutofocusSearchBar(checked) {
+		localStorage.mauAutofocusSearchBar = checked
+	}
+
+	// End settings
 
 	reloadPacks() {
 		this.imageObserver.disconnect()
@@ -218,6 +228,9 @@ class App extends Component {
 		for (const entry of intersections) {
 			const packID = entry.target.getAttribute("data-pack-id")
 			const navElement = document.getElementById(`nav-${packID}`)
+			if (!navElement) {
+				continue
+			}
 			if (entry.isIntersecting) {
 				navElement.classList.add("visible")
 				const bb = navElement.getBoundingClientRect()
@@ -320,6 +333,14 @@ const Settings = ({ app }) => html`
 					<option value="dark">Dark</option>
 					<option value="black">Black</option>
 				</select>
+			</div>
+			<div>
+				Autofocus search bar:
+				<input
+					type="checkbox"
+					checked=${shouldAutofocusSearchBar()}
+					onChange=${evt => app.setAutofocusSearchBar(evt.target.checked)}
+				/>
 			</div>
 		</div>
 	</section>
