@@ -15,7 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html, render, Component } from "../lib/htm/preact.js"
 import { Spinner } from "./spinner.js"
-import { shouldAutofocusSearchBar, SearchBox } from "./search-box.js"
+import { shouldAutofocusSearchBar, shouldDisplayAutofocusSearchBar, SearchBox } from "./search-box.js"
+import { checkMobileSafari } from "./user-agent-detect.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"
 
@@ -35,7 +36,12 @@ const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
 // This is also used to fix scrolling to sections on Element iOS
-const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)
+const isMobileSafari = checkMobileSafari()
+
+// We need to detect iOS webkit / Android because autofocusing a field does not open
+// the device keyboard by design, making the option obsolete
+const shouldAutofocusOption = shouldAutofocusSearchBar()
+const displayAutofocusOption = shouldDisplayAutofocusSearchBar()
 
 const supportedThemes = ["light", "dark", "black"]
 
@@ -338,14 +344,14 @@ const Settings = ({ app }) => html`
 					<option value="black">Black</option>
 				</select>
 			</div>
-			<div>
+			${displayAutofocusOption ? html`<div>
 				Autofocus search bar:
 				<input
 					type="checkbox"
-					checked=${shouldAutofocusSearchBar()}
+					checked=${shouldAutofocusOption}
 					onChange=${evt => app.setAutofocusSearchBar(evt.target.checked)}
 				/>
-			</div>
+			</div>` : null}
 		</div>
 	</section>
 `
