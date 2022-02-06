@@ -15,12 +15,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html } from "../lib/htm/preact.js"
 
-export const SearchBox = ({ onKeyUp, placeholder = 'Find stickers' }) => {
-	const component = html`
+export const SearchBox = ({ onKeyUp, resetSearch, value }) => {
+	const className = `icon-display ${value ? 'reset-click-zone' : null}`
+	const title = value ? 'Click to reset' : null
+	const onClick = value ? resetSearch : null
+
+	const iconToDisplay = `icon-${!value ? 'search' : 'reset'}`
+
+	return html`
 		<div class="search-box">
-			<input type="text" placeholder=${placeholder} onKeyUp=${onKeyUp} />
-			<span class="icon icon-search" />
+			<input value=${value} placeholder="Find stickers" onKeyUp=${onKeyUp} />
+			<div class=${className} title=${title} onClick=${onClick}>
+				<span class="icon ${iconToDisplay}" />
+			</div>
 		</div>
 	`
-	return component
 }
