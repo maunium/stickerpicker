@@ -38,7 +38,7 @@ export class SearchBox extends Component {
 		// required for firefox / webview usage in mobile clients
 		const inputInWebView = document.querySelector(`.${SEARCHBOX_CLASSNAME} input`)
 		if (inputInWebView && this.autofocus) {
-			inputInWebView.focus()
+			setTimeout(() => inputInWebView.focus(), 100)
 		}
 	}
 
@@ -72,7 +72,6 @@ export class SearchBox extends Component {
 					placeholder="Find stickers …"
 					value=${this.value}
 					onKeyUp=${this.search}
-					autoFocus=${this.autofocus}
 				/>
 				<div class=${className} title=${title} onClick=${onClick}>
 					<span class="icon ${iconToDisplay}" />
