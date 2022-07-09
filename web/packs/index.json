@@ -1,6 +1,7 @@
 {
   "packs": [
-    "CatPusheen.json"
+    "CatPusheen.json",
+    "FlynnFlyunyua.json"
   ],
   "homeserver_url": "https://kde.modular.im"
 }
