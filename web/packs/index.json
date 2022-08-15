@@ -1,7 +1,10 @@
 {
   "packs": [
     "CatPusheen.json",
-    "FlynnFlyunyua.json"
+    "FlynnFlyunyua.json",
+    "gnuplusmemes.json",
+    "Mokocchi.json",
+    "Aida_ww_by_demybot.json"
   ],
   "homeserver_url": "https://kde.modular.im"
 }
