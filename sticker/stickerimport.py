@@ -45,7 +45,7 @@ def add_meta(document: Document, info: matrix.StickerInfo, pack: StickerSetFull)
         if isinstance(attr, DocumentAttributeSticker):
             info["body"] = attr.alt
     info["id"] = f"tg-{document.id}"
-    info["net.maunium.telegram.sticker"] = {
+    info["info"]["net.maunium.telegram.sticker"] = {
         "pack": {
             "id": str(pack.set.id),
             "short_name": pack.set.short_name,
@@ -73,7 +73,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
     try:
         with util.open_utf8(pack_path) as pack_file:
             existing_pack = json.load(pack_file)
-            already_uploaded = {int(sticker["net.maunium.telegram.sticker"]["id"]): sticker
+            already_uploaded = {int(sticker["info"]["net.maunium.telegram.sticker"]["id"]): sticker
                                 for sticker in existing_pack["stickers"]}
             print(f"Found {len(already_uploaded)} already reuploaded stickers")
     except FileNotFoundError:
@@ -97,7 +97,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
             # If there was no sticker metadata, use the first emoji we find
             if doc["body"] == "":
                 doc["body"] = sticker.emoticon
-            doc["net.maunium.telegram.sticker"]["emoticons"].append(sticker.emoticon)
+            doc["info"]["net.maunium.telegram.sticker"]["emoticons"].append(sticker.emoticon)
 
     with util.open_utf8(pack_path, "w") as pack_file:
         json.dump({
