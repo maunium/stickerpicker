@@ -47,6 +47,11 @@ window.onmessage = event => {
 }
 
 export function sendSticker(content) {
+	if (content["info"]["net.maunium.telegram.sticker"] === undefined) {
+		// Old sticker, move the property to its new location
+		content["info"]["net.maunium.telegram.sticker"] = content["net.maunium.telegram.sticker"];
+		delete content["net.maunium.telegram.sticker"];
+	}
 	const data = {
 		content: { ...content },
 		// `name` is for Element Web (and also the spec)
