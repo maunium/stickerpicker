@@ -153,7 +153,7 @@ async def main(args: argparse.Namespace) -> None:
                 return
             input_packs.append(InputStickerSetShortName(short_name=match.group(1)))
         for input_pack in input_packs:
-            pack: StickerSetFull = await client(GetStickerSetRequest(input_pack))
+            pack: StickerSetFull = await client(GetStickerSetRequest(input_pack, hash=0))
             await reupload_pack(client, pack, args.output_dir)
     else:
         parser.print_help()
