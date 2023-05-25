@@ -152,9 +152,16 @@ class App extends Component {
 		this._loadPacks(true)
 	}
 
+	async populateStickersByID(allPacks) {
+		const allStickers = allPacks.map(({ stickers }) => stickers).flat()
+		allStickers.forEach((sticker) => {
+			this.stickersByID.set(sticker.id, sticker)
+		})
+	}
+
 	_loadPacks(disableCache = false) {
 		const cache = disableCache ? "no-cache" : undefined
-		fetch(INDEX, { cache }).then(async indexRes => {
+		return fetch(INDEX, { cache }).then(async indexRes => {
 			if (indexRes.status >= 400) {
 				this.setState({
 					loading: false,
@@ -163,25 +170,25 @@ class App extends Component {
 				return
 			}
 			const indexData = await indexRes.json()
+			const packNames = indexData.packs ?? []
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
-			for (const packFile of indexData.packs) {
+			const fetchedPacks = await Promise.all(packNames.map(async packFile => {
 				let packRes
 				if (packFile.startsWith("https://") || packFile.startsWith("http://")) {
 					packRes = await fetch(packFile, { cache })
 				} else {
 					packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
 				}
-				const packData = await packRes.json()
-				for (const sticker of packData.stickers) {
-					this.stickersByID.set(sticker.id, sticker)
-				}
-				this.setState({
-					packs: [...this.state.packs, packData],
-					loading: false,
-				})
-			}
+				return await packRes.json()
+			}))
+			this.setState({
+				packs: fetchedPacks,
+				loading: false,
+			})
+			this.populateStickersByID(fetchedPacks)
 			this.updateFrequentlyUsed()
+			return fetchedPacks
 		}, error => this.setState({ loading: false, error }))
 	}
 
