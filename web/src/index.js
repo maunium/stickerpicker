@@ -47,6 +47,13 @@ const defaultState = {
 	},
 }
 
+const makeFrequentlyUsedState = ({ stickerIDs, stickers } = {}) => ({
+	id: "frequently-used",
+	title: "Frequently used",
+	stickerIDs: stickerIDs ?? [],
+	stickers: stickers ?? [],
+})
+
 class App extends Component {
 	constructor(props) {
 		super(props)
@@ -57,29 +64,26 @@ class App extends Component {
 			error: null,
 			stickersPerRow: parseInt(localStorage.mauStickersPerRow || "4"),
 			theme: localStorage.mauStickerThemeOverride || this.defaultTheme,
-			frequentlyUsed: {
-				id: "frequently-used",
-				title: "Frequently used",
-				stickerIDs: frequent.get(),
-				stickers: [],
-			},
+			frequentlyUsed: makeFrequentlyUsedState(),
 			filtering: defaultState.filtering,
 		}
+
 		if (!supportedThemes.includes(this.state.theme)) {
 			this.state.theme = "light"
 		}
 		if (!supportedThemes.includes(this.defaultTheme)) {
 			this.defaultTheme = "light"
 		}
-		this.stickersByID = new Map(JSON.parse(localStorage.mauFrequentlyUsedStickerCache || "[]"))
-		this.state.frequentlyUsed.stickers = this._getStickersByID(this.state.frequentlyUsed.stickerIDs)
+
 		this.imageObserver = null
 		this.packListRef = null
 		this.navRef = null
+
 		this.searchStickers = this.searchStickers.bind(this)
 		this.sendSticker = this.sendSticker.bind(this)
 		this.navScroll = this.navScroll.bind(this)
 		this.reloadPacks = this.reloadPacks.bind(this)
+		this.clearFrequentlyUsed = this.clearFrequentlyUsed.bind(this)
 		this.observeSectionIntersections = this.observeSectionIntersections.bind(this)
 		this.observeImageIntersections = this.observeImageIntersections.bind(this)
 	}
@@ -88,17 +92,26 @@ class App extends Component {
 		return ids.map(id => this.stickersByID.get(id)).filter(sticker => !!sticker)
 	}
 
+	_setFrequentlyUsed(stickerIDs = []) {
+		const stickers = this._getStickersByID(stickerIDs)
+		const frequentlyUsed = makeFrequentlyUsedState({ stickerIDs, stickers })
+		this.setState({ frequentlyUsed })
+		frequent.setFrequentlyUsedCacheStorage(stickers)
+	}
+
 	updateFrequentlyUsed() {
 		const stickerIDs = frequent.get()
-		const stickers = this._getStickersByID(stickerIDs)
-		this.setState({
-			frequentlyUsed: {
-				...this.state.frequentlyUsed,
-				stickerIDs,
-				stickers,
-			},
-		})
-		localStorage.mauFrequentlyUsedStickerCache = JSON.stringify(stickers.map(sticker => [sticker.id, sticker]))
+		this._setFrequentlyUsed(stickerIDs)
+	}
+
+	refreshFrequentlyUsed(packs) {
+		const stickerIDs = frequent.removeNotFoundFromStorage(packs)
+		this._setFrequentlyUsed(stickerIDs)
+	}
+
+	clearFrequentlyUsed() {
+		frequent.removeAll()
+		this._setFrequentlyUsed()
 	}
 
 	searchStickers(e) {
@@ -152,9 +165,20 @@ class App extends Component {
 		this._loadPacks(true)
 	}
 
+	_initializeStickersByID(ids) {
+		this.stickersByID = new Map(ids ?? [])
+	}
+
+	async populateStickersByID(allPacks) {
+		const allStickers = allPacks.map(({ stickers }) => stickers).flat()
+		allStickers.forEach((sticker) => {
+			this.stickersByID.set(sticker.id, sticker)
+		})
+	}
+
 	_loadPacks(disableCache = false) {
 		const cache = disableCache ? "no-cache" : undefined
-		fetch(INDEX, { cache }).then(async indexRes => {
+		return fetch(INDEX, { cache }).then(async indexRes => {
 			if (indexRes.status >= 400) {
 				this.setState({
 					loading: false,
@@ -163,34 +187,35 @@ class App extends Component {
 				return
 			}
 			const indexData = await indexRes.json()
+			const packNames = indexData.packs ?? []
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
-			for (const packFile of indexData.packs) {
+			const fetchedPacks = await Promise.all(packNames.map(async packFile => {
 				let packRes
 				if (packFile.startsWith("https://") || packFile.startsWith("http://")) {
 					packRes = await fetch(packFile, { cache })
 				} else {
 					packRes = await fetch(`${PACKS_BASE_URL}/${packFile}`, { cache })
 				}
-				const packData = await packRes.json()
-				for (const sticker of packData.stickers) {
-					this.stickersByID.set(sticker.id, sticker)
-				}
-				this.setState({
-					packs: [...this.state.packs, packData],
-					loading: false,
-				})
-			}
-			this.updateFrequentlyUsed()
+				return await packRes.json()
+			}))
+			this.setState({
+				packs: fetchedPacks,
+				loading: false,
+			})
+			this.populateStickersByID(fetchedPacks)
+			this.refreshFrequentlyUsed(fetchedPacks)
+			return fetchedPacks
 		}, error => this.setState({ loading: false, error }))
 	}
 
 	componentDidMount() {
 		document.documentElement.style.setProperty("--stickers-per-row", this.state.stickersPerRow.toString())
+
 		this._loadPacks()
-		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, {
-			rootMargin: "100px",
-		})
+		this._initializeStickersByID(frequent.getFromCache())
+
+		this.imageObserver = new IntersectionObserver(this.observeImageIntersections, { rootMargin: "100px" })
 		this.sectionObserver = new IntersectionObserver(this.observeSectionIntersections)
 	}
 
@@ -302,6 +327,7 @@ const Settings = ({ app }) => html`
 		<h1>Settings</h1>
 		<div class="settings-list">
 			<button onClick=${app.reloadPacks}>Reload</button>
+			<button onClick=${app.clearFrequentlyUsed}>Clear frequently used</button>
 			<div>
 				<label for="stickers-per-row">Stickers per row: ${app.state.stickersPerRow}</label>
 				<input type="range" min=2 max=10 id="stickers-per-row" id="stickers-per-row"
