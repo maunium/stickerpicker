@@ -109,6 +109,7 @@ class App extends Component {
 		const packsWithFilteredStickers = allPacks.map(pack => ({
 			...pack,
 			stickers: pack.stickers.filter(sticker =>
+				sanitizeString(pack.title).includes(searchTerm) ||
 				sanitizeString(sticker.body).includes(searchTerm) ||
 				sanitizeString(sticker.id).includes(searchTerm)
 			),
