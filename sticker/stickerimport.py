@@ -19,13 +19,13 @@ import asyncio
 import os.path
 import json
 import re
-
+import os
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetAllStickersRequest, GetStickerSetRequest
 from telethon.tl.types.messages import AllStickers
 from telethon.tl.types import InputStickerSetShortName, Document, DocumentAttributeSticker
 from telethon.tl.types.messages import StickerSet as StickerSetFull
-
+from subprocess import run
 from .lib import matrix, util
 
 
@@ -38,6 +38,19 @@ async def reupload_document(client: TelegramClient, document: Document) -> matri
     mxc = await matrix.upload(data, "image/png", f"{document.id}.png")
     print(".", flush=True)
     return util.make_sticker(mxc, width, height, len(data))
+
+async def reupload_document_gif(client: TelegramClient, document: Document) -> matrix.StickerInfo:
+    print(f"Reuploading {document.id}", end="", flush=True)
+    data = await client.download_media(document, file=bytes)
+    print(".", end="", flush=True)
+    # run LottieConverter
+    convert_data = run(['lottieconverter', '-', '-', 'gif', '512x512', '60'],capture_output = True, input=data).stdout
+    print(".", end="", flush=True)
+    mxc = await matrix.upload(convert_data, "image/gif", f"{document.id}.gif")
+    print(".", flush=True)
+    # 512x512 is mandatory for all stickers
+    return util.make_sticker(mxc, 512, 512, len(data), mimetype="image/gif")
+
 
 
 def add_meta(document: Document, info: matrix.StickerInfo, pack: StickerSetFull) -> None:
@@ -57,8 +70,7 @@ def add_meta(document: Document, info: matrix.StickerInfo, pack: StickerSetFull)
 
 async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir: str) -> None:
     if pack.set.animated:
-        print("Animated stickerpacks are currently not supported")
-        return
+        print("Warning, to convert animated stickers, you need lottieconverter installed")
 
     pack_path = os.path.join(output_dir, f"{pack.set.short_name}.json")
     try:
@@ -85,7 +97,10 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
             reuploaded_documents[document.id] = already_uploaded[document.id]
             print(f"Skipped reuploading {document.id}")
         except KeyError:
-            reuploaded_documents[document.id] = await reupload_document(client, document)
+            if pack.set.animated:
+                reuploaded_documents[document.id] = await reupload_document_gif(client,document)
+            else:
+                reuploaded_documents[document.id] = await reupload_document(client, document)
         # Always ensure the body and telegram metadata is correct
         add_meta(document, reuploaded_documents[document.id], pack)
 
