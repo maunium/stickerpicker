@@ -9,7 +9,8 @@ array. The index.json file should look something like this:
 
 ```json
 {
-  "homeserver_url": "https://example.com",
+  "homeserver_url": "https://example.com", // required
+  "homeserver_animated_url": "https://example.com", // optional : the URL of a webserver which provides a media repo with animated media support
   "packs": [
     "your_telegram_imported_pack.json",
     "another_telegram_imported_pack.json",

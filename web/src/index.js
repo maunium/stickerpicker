@@ -28,10 +28,19 @@ const params = new URLSearchParams(document.location.search)
 if (params.has('config')) {
 	INDEX = params.get("config")
 }
+
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
+let HOMESERVER_ANIMATED_URL = HOMESERVER_URL
 
-const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
+const isAnimated = (content) => {
+	return content.info["mimetype"] === "image/gif";
+};
+
+const makeThumbnailURL = (content) => {
+	const homeServerUrl = isAnimated(content) ? HOMESERVER_ANIMATED_URL : HOMESERVER_URL;
+	return `${homeServerUrl}/_matrix/media/r0/thumbnail/${content.url.substr(6)}?height=128&width=128&method=scale`;
+};
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
 // This is also used to fix scrolling to sections on Element iOS
@@ -164,6 +173,7 @@ class App extends Component {
 			}
 			const indexData = await indexRes.json()
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
+			HOMESERVER_ANIMATED_URL = indexData.homeserver_animated_url || HOMESERVER_URL
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
 				let packRes
@@ -336,7 +346,7 @@ const NavBarItem = ({ pack, iconOverride = null }) => html`
 			${iconOverride ? html`
 				<span class="icon icon-${iconOverride}"/>
 			` : html`
-				<img src=${makeThumbnailURL(pack.stickers[0].url)}
+				<img src=${makeThumbnailURL(pack.stickers[0])}
 					alt=${pack.stickers[0].body} class="visible" />
 			`}
 		</div>
@@ -348,15 +358,15 @@ const Pack = ({ pack, send }) => html`
 		<h1>${pack.title}</h1>
 		<div class="sticker-list">
 			${pack.stickers.map(sticker => html`
-				<${Sticker} key=${sticker.id} content=${sticker} send=${send}/>
+				<${Sticker} key=${sticker.id} sticker=${sticker} send=${send}/>
 			`)}
 		</div>
 	</section>
 `
 
-const Sticker = ({ content, send }) => html`
-	<div class="sticker" onClick=${send} data-sticker-id=${content.id}>
-		<img data-src=${makeThumbnailURL(content.url)} alt=${content.body} title=${content.body} />
+const Sticker = ({ sticker, send }) => html`
+	<div class="sticker" onClick=${send} data-sticker-id=${sticker.id}>
+		<img data-src=${makeThumbnailURL(sticker)} alt=${sticker.body} title=${sticker.body} />
 	</div>
 `
 
