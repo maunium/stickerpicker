@@ -14,17 +14,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { html, Component } from "../lib/htm/preact.js"
+import { checkMobileSafari, checkAndroid } from "./user-agent-detect.js"
+
+export function shouldDisplayAutofocusSearchBar() {
+  return !checkMobileSafari() && !checkAndroid()
+}
+
+export function shouldAutofocusSearchBar() {
+	return localStorage.mauAutofocusSearchBar === 'true' && shouldDisplayAutofocusSearchBar()
+}
+
+export function focusSearchBar() {
+	const inputInWebView = document.querySelector('.search-box input')
+	if (inputInWebView && shouldAutofocusSearchBar()) {
+		inputInWebView.focus()
+	}
+}
 
 export class SearchBox extends Component {
 	constructor(props) {
 		super(props)
 
+		this.autofocus = shouldAutofocusSearchBar()
 		this.value = props.value
 		this.onSearch = props.onSearch
 		this.onReset = props.onReset
 
 		this.search = this.search.bind(this)
 		this.clearSearch = this.clearSearch.bind(this)
+	}
+
+	componentDidMount() {
+		focusSearchBar()
 	}
 
 	componentWillReceiveProps(props) {
@@ -57,6 +78,7 @@ export class SearchBox extends Component {
 					placeholder="Find stickers …"
 					value=${this.value}
 					onKeyUp=${this.search}
+					autoFocus=${this.autofocus}
 				/>
 				<div class=${className} title=${title} onClick=${onClick}>
 					<span class="icon ${iconToDisplay}" />

@@ -178,6 +178,13 @@ div.search-box
   transition: all .1s
   border: 1px solid transparent
 
+  &:focus-within
+    opacity: 1
+    border: 1px solid var(--text-color)
+
+  &:not(:focus-within):hover
+    opacity: .7
+
   input,.icon-display
     color: var(--text-color)
     outline: none
