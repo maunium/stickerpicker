@@ -13,14 +13,77 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { html } from "../lib/htm/preact.js"
+import { html, Component } from "../lib/htm/preact.js"
+import { checkMobileSafari, checkAndroid } from "./user-agent-detect.js"
 
-export const SearchBox = ({ onKeyUp, placeholder = 'Find stickers' }) => {
-	const component = html`
-		<div class="search-box">
-			<input type="text" placeholder=${placeholder} onKeyUp=${onKeyUp} />
-			<span class="icon icon-search" />
-		</div>
-	`
-	return component
+export function shouldDisplayAutofocusSearchBar() {
+  return !checkMobileSafari() && !checkAndroid()
+}
+
+export function shouldAutofocusSearchBar() {
+	return localStorage.mauAutofocusSearchBar === 'true' && shouldDisplayAutofocusSearchBar()
+}
+
+export function focusSearchBar() {
+	const inputInWebView = document.querySelector('.search-box input')
+	if (inputInWebView && shouldAutofocusSearchBar()) {
+		inputInWebView.focus()
+	}
+}
+
+export class SearchBox extends Component {
+	constructor(props) {
+		super(props)
+
+		this.autofocus = shouldAutofocusSearchBar()
+		this.value = props.value
+		this.onSearch = props.onSearch
+		this.onReset = props.onReset
+
+		this.search = this.search.bind(this)
+		this.clearSearch = this.clearSearch.bind(this)
+	}
+
+	componentDidMount() {
+		focusSearchBar()
+	}
+
+	componentWillReceiveProps(props) {
+		this.value = props.value
+	}
+
+	search(e) {
+		if (e.key === "Escape") {
+			this.clearSearch()
+			return
+		}
+		this.onSearch(e.target.value)
+	}
+
+	clearSearch() {
+		this.onReset()
+	}
+
+	render() {
+		const isEmpty = !this.value
+
+		const className = `icon-display ${isEmpty ? null : 'reset-click-zone'}`
+		const title = isEmpty ? null : 'Click to reset'
+		const onClick = isEmpty ? null : this.clearSearch
+		const iconToDisplay = `icon-${isEmpty ? 'search' : 'reset'}`
+
+		return html`
+			<div class="search-box">
+				<input
+					placeholder="Find stickers …"
+					value=${this.value}
+					onKeyUp=${this.search}
+					autoFocus=${this.autofocus}
+				/>
+				<div class=${className} title=${title} onClick=${onClick}>
+					<span class="icon ${iconToDisplay}" />
+				</div>
+			</div>
+		`
+	}
 }
