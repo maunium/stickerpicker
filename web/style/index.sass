@@ -92,8 +92,11 @@ main.theme-black
   &.icon-recent
     --icon-image: url(../res/recent.svg)
 
-  &.icon.icon-search
+  &.icon-search
     --icon-image: url(../res/search.svg)
+
+  &.icon-reset
+    --icon-image: url(../res/reset.svg)
 
 nav
   display: flex
@@ -166,30 +169,42 @@ div.sticker
     margin: 15%
 
 div.search-box
-  position: relative
   display: flex
+  margin: $search-box-input-margin
+  padding: 0
+  border-radius: .4rem
+  background-color: var(--search-box-color)
+  opacity: .5
+  transition: all .1s
+  border: 1px solid transparent
 
-  >input[type="text"]
-    flex-grow: 1
-    background-color: var(--search-box-color)
+  input,.icon-display
+    color: var(--text-color)
     outline: none
     border: none
-    border-radius: .25rem
     height: $search-box-input-height
+    margin: 0
     padding: $search-box-input-padding
-    padding-right: calc(#{$search-box-icon-size} + #{$search-box-input-padding})
-    margin: $search-box-input-margin
-    font-size: 1rem
-    color: var(--text-color)
+    background-color: transparent
+    -webkit-tap-highlight-color: transparent
 
-  >span.icon
-    display: flex
-    position: absolute
-    top: calc(50% - #{$search-box-icon-size} / 2)
-    right: $search-box-icon-size
-    width: $search-box-icon-size
-    height: $search-box-icon-size
-    box-sizing: border-box
+  .icon-display
+    width: $search-box-input-height
+
+    &.reset-click-zone
+      cursor: pointer
+
+    .icon
+      display: block
+      width: $search-box-icon-size
+      height: $search-box-icon-size
+
+    .icon-search
+      opacity: .5
+
+  input
+    flex-grow: 1
+    font-size: 1rem
 
 div.settings-list
   display: flex
@@ -202,5 +217,5 @@ div.settings-list
     padding: .5rem
     border-radius: .25rem
 
-  input
+  input:not([type="checkbox"])
     width: 100%
