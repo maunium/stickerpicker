@@ -9,7 +9,17 @@
     "stickers3.json",
     "stickers4.json",
     "stickers5.json",
-    "stickers6.json"
+    "stickers6.json",
+	"TakemymoneySPACK.json",
+    "nasharasha.json",
+    "orkopack_ludi_Z.json",
+    "Batska.json",
+    "LSPteam.json",
+    "BrassicStickers.json",
+    "DSW_S.json",
+    "capybaaaras.json",
+    "memesvol.json",
+    "Kukoyakavasya.json"
   ],
   "homeserver_url": "https://matrix-client.matrix.org"
 }
