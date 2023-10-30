@@ -23,7 +23,8 @@
     "TheBestMovie.json",
     "sovietmovies.json",
     "friendsbysmol.json",
-    "stickers6.json"
+    "stickers6.json",
+    "duck.json"
   ],
   "homeserver_url": "https://ang-cloud.ru:15045"
 }
