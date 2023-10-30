@@ -10,7 +10,7 @@
     "stickers4.json",
     "stickers5.json",
     "stickers6.json",
-	"TakemymoneySPACK.json",
+    "TakemymoneySPACK.json",
     "nasharasha.json",
     "orkopack_ludi_Z.json",
     "Batska.json",
@@ -19,7 +19,21 @@
     "DSW_S.json",
     "capybaaaras.json",
     "memesvol.json",
-    "Kukoyakavasya.json"
+    "Kukoyakavasya.json",
+    "waddles_pig.json",
+    "Noviopus_Vulgaris.json",
+    "NBstickeriaPPS.json",
+    "Zarya1.json",
+    "Closedparty.json",
+    "SebekBandit.json",
+    "dodoom7it.json",
+    "WagnerOrchestra.json",
+    "Rokot.json",
+    "terebonk_2.json",
+    "FSB_BORTNIKOV.json",
+    "mudak_povestka.json",
+    "vesnaZ.json",
+    "zvoboz.json"
   ],
   "homeserver_url": "https://matrix-client.matrix.org"
 }
