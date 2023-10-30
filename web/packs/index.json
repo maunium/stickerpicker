@@ -1,0 +1,29 @@
+{
+  "packs": [
+    "cat.json",
+    "fany.json",
+    "stickers1.json",
+    "stickers2.json",
+    "stickers3.json",
+    "SVO404_by_fStikBot.json",
+    "stickers4.json",
+    "stickers5.json",
+    "TakemymoneySPACK.json",
+    "FSB_BORTNIKOV.json",
+    "zvoboz.json",
+    "WagnerOrchestra.json",
+    "Rokot.json",
+    "vesnaZ.json",
+    "nasharasha.json",
+    "Batska.json",
+    "orkopack_ludi_Z.json",
+    "memesvol.json",
+    "terebonk_2.json",
+    "Closedparty.json",
+    "TheBestMovie.json",
+    "sovietmovies.json",
+    "friendsbysmol.json",
+    "stickers6.json"
+  ],
+  "homeserver_url": "https://ang-cloud.ru:15045"
+}
