@@ -1,6 +1,15 @@
 {
   "packs": [
-    "stickers7.json"
+    "stickers7.json",
+    "cat.json",
+    "fany.json",
+    "duck.json",
+    "stickers1.json",
+    "stickers2.json",
+    "stickers3.json",
+    "stickers4.json",
+    "stickers5.json",
+    "stickers6.json"
   ],
   "homeserver_url": "https://matrix-client.matrix.org"
 }
