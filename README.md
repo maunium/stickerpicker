@@ -32,10 +32,10 @@ If you prefer video tutorials, [Brodie Robertson](https://www.youtube.com/c/Brod
 
 ## Preview
 ### Element Web
-![Element Web](preview-element-web.png)
+![Element Web](doc/img/preview-element-web.png)
 
 ### Element Android
-![Element Android](preview-element-android.png)
+![Element Android](doc/img/preview-element-android.png)
 
 ### Element iOS (dark theme)
-![Element iOS](preview-element-ios.png)
+![Element iOS](doc/img/preview-element-ios.png)
