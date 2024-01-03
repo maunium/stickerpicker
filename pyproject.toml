@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "src"
+version = "1.0.0"
+description = "Multi user stickerpicker"
+authors = ["Tulir Asokan", "MCV"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+aiohttp = "3.8.1"
+yarl = "1.7.2"
+Pillow = "9.1.1"
+Telethon = "1.24.0"
+cryptg = "0.3.1"
+python-magic = "0.4.25"
+typer = "^0.9.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+import='src:import_pack'
+pack='src:add_pack'
