@@ -1,0 +1,6 @@
+{
+  "packs": [
+    "gura.json"
+  ],
+  "homeserver_url": "https://matrix.cronolabs.net"
+}
