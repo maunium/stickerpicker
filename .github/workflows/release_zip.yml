@@ -28,7 +28,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.0${{ github.run_number }}
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
