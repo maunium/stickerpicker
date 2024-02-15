@@ -32,9 +32,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.${{ github.run_number }}
           prerelease: true
-          upload_url: ${{ steps.create-zip.outputs.upload_url }}
-          asset_path: ./gura.zip
-          asset_name: gura-0.${{ github.run_number }}.zip
-          asset_content_type: application/zip
+          files: ${{ steps.create-zip.outputs.upload_url }}
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
