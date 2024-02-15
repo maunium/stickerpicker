@@ -30,6 +30,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.${{ github.run_number }}
-          prerelease: 1
+          prerelease: true
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
