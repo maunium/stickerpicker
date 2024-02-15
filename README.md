@@ -1,4 +1,4 @@
-# Maunium sticker picker - slightly modified for use with CronoLabs
+# Maunium sticker picker - now with CronoLabs support!
 A fast and simple Matrix sticker picker widget. Tested on Element Web, Android & iOS. Zips available in [releases](https://github.com/ron1n/crono-stickerpicker/releases) for the clients that prefer emotes (FluffyChat)  
 
 ## Discussion for Maunium Sticker Picker
@@ -6,6 +6,17 @@ Matrix room: [`#stickerpicker:maunium.net`](https://matrix.to/#/#stickerpicker:m
 
 ## Discussion for this fork and sticker submissions
 Matrix room: [`#gdb:matrix.cronolabs.net`](https://app.element.io/#/room/#gdb:matrix.cronolabs.net)
+
+Any adverse side effects up to including:
+
+- nausea
+- heartburn
+- indigestion
+- upset
+- stomach 
+- diarrhea
+
+tag `runner`
 
 ## Instructions
 For setup and usage instructions, please visit the [wiki](https://github.com/maunium/stickerpicker/wiki):
