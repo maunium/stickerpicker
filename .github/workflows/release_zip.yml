@@ -14,7 +14,6 @@ jobs:
           path: gura/
   release-zips:
     name: Release zip packages
-    id: create-zip-release
     runs-on: ubuntu-latest
     needs: build-zips
     steps:
@@ -23,6 +22,7 @@ jobs:
         with:
           name: gura
       - name: Zip this shit up again for some reason
+        id: create-zip
         uses: thedoctor0/zip-release@master
         with:
           filename: gura.zip
@@ -32,7 +32,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.${{ github.run_number }}
           prerelease: true
-          upload_url: ${{ steps.create_zip_release.outputs.upload_url }}
+          upload_url: ${{ steps.create-zip.outputs.upload_url }}
           asset_path: ./gura.zip
           asset_name: gura-0.${{ github.run_number }}.zip
           asset_content_type: application/zip
