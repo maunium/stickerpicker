@@ -14,5 +14,14 @@ jobs:
         with: 
           name: gura
           path: gura/
-          name: lain
-          path: lain/
+  release-zips:
+    name: Release zip packages
+    runs-on: ubuntu-latest
+    needs: build-zips
+    steps:
+      - name: Download sticker packs as artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: gura
+      - name: Test artifact download
+        run: ls -lahR 
