@@ -21,5 +21,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: gura
-      - name: Test artifact download
-        run: ls -lahR 
+      - name: Zip this shit up again for some reason
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: gura.zip 
