@@ -11,7 +11,7 @@ For setup and usage instructions, please visit the [wiki](https://github.com/mau
 * [Enabling the widget](https://github.com/maunium/stickerpicker/wiki/Enabling-the-widget)
 * [Hosting on GitHub pages](https://github.com/maunium/stickerpicker/wiki/Hosting-on-GitHub-pages)
 
-If you prefer video tutorials, [Brodie Robertson](https://www.youtube.com/c/BrodieRobertson) has made a great video on setting up the picker and creating some packs: https://youtu.be/Yz3H6KJTEI0.
+If you prefer video tutorials, [Brodie Robertson](https://odysee.com/@BrodieRobertson) has made a great video on setting up the picker and creating some packs: https://odysee.com/@BrodieRobertson:5/adding-your-cringe-stickers-to-matrix
 
 ## Comparison with other sticker pickers
 
