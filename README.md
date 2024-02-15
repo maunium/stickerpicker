@@ -16,7 +16,7 @@ Any adverse side effects up to including:
 - stomach 
 - diarrhea
 
-yay! tag `@runnnr`
+yay! tag `@room`
 
 ## Instructions
 For setup and usage instructions, please visit the [wiki](https://github.com/maunium/stickerpicker/wiki):
