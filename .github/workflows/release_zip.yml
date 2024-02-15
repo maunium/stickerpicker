@@ -14,6 +14,9 @@ jobs:
         with: 
           name: gura
           path: gura/
+        with:
+          name: lain
+          path: lain/
   release-zips:
     name: Release zip packages
     runs-on: ubuntu-latest
