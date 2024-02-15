@@ -10,8 +10,8 @@ jobs:
       - name: Upload sticker packs as artifacts
         uses: actions/upload-artifact@v4
         with: 
-          name: gura
-          path: gura/
+          name: stickers
+          path: **/*.png
   release-zips:
     name: Release zip packages
     runs-on: ubuntu-latest
@@ -20,18 +20,18 @@ jobs:
       - name: Download sticker packs as artifacts
         uses: actions/download-artifact@v4
         with:
-          name: gura
+          name: stickers
       - name: Zip this shit up again for some reason
         id: create-zip
         uses: thedoctor0/zip-release@master
         with:
-          filename: gura.zip
+          filename: stickers.zip
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.${{ github.run_number }}
           prerelease: true
-          files: ${{ steps.create-zip.outputs.upload_url }}
+          files: stickers.zip
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
