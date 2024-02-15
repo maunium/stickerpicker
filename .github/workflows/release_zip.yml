@@ -29,6 +29,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: 0.0${{ github.run_number }}
+          tag_name: 0.${{ github.run_number }}
+          prerelease: 1
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
