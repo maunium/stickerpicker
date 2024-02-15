@@ -14,6 +14,7 @@ jobs:
           path: gura/
   release-zips:
     name: Release zip packages
+    id: create-zip-release
     runs-on: ubuntu-latest
     needs: build-zips
     steps:
@@ -31,5 +32,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: 0.${{ github.run_number }}
           prerelease: true
+          upload_url: ${{ steps.create_zip_release.outputs.upload_url }}
+          asset_path: ./gura.zip
+          asset_name: gura-0.${{ github.run_number }}.zip
+          asset_content_type: application/zip
         env:
           GITHUB_REPOSITORY: ron1n/crono-stickerpicker
