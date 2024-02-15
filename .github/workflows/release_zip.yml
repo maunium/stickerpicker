@@ -1,11 +1,16 @@
-name: Stickers Continuous Delivery
+name: Stickers/Emotes Continuous Delivery
 on: push
 jobs:
   build-zips:
-    name: Build zip artifacts
+    name: Build zip packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         name: Checkout repo
       - run: pwd
       - run: ls -lah
+      - name: Upload sticker packs as artifacts
+        uses: actions/upload-artifact@v4
+        with: 
+          name: gura
+          path: gura/
