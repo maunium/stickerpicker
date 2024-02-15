@@ -1,8 +1,11 @@
+name: Stickers Continuous Delivery
 on: push
 jobs:
   build-zips:
+    name: Build zip artifacts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        name: Checkout repo
       - run: pwd
       - run: ls -lah
