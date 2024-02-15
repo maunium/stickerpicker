@@ -5,10 +5,8 @@ jobs:
     name: Build zip packages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout repo
-      - run: pwd
-      - run: ls -lah
+      - name: Checkout repo
+        uses: actions/checkout@v4
       - name: Upload sticker packs as artifacts
         uses: actions/upload-artifact@v4
         with: 
