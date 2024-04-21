@@ -40,6 +40,7 @@ const isMobileSafari = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && naviga
 
 const supportedThemes = ["light", "dark", "black"]
 
+
 const defaultState = {
 	packs: [],
 	filtering: {

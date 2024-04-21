@@ -17,9 +17,17 @@
 const widgetId = null; // if you know the widget ID, supply it.
 const api = new mxwidgets.WidgetApi(widgetId);
 
+
 // Before doing anything else, request capabilities:
 api.requestCapabilities(mxwidgets.StickerpickerCapabilities);
 api.requestCapability(mxwidgets.MatrixCapabilities.MSC4039UploadFile);
+
+
+// Start the messaging
+api.start();
+
+// If waitForIframeLoad is false, tell the client that we're good to go
+api.sendContentLoaded();
 
 export function sendSticker(content){
     api.sendSticker(content);
