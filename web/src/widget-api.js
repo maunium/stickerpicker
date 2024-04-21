@@ -35,14 +35,14 @@ export function sendGIF(url){
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           const responseData = xhr.responseText;
-          // Call function A with the response data
+          // Call uploadFile with response data
           api.uploadFile(responseData)
             .then(result => {
                 console.log("Here's the result:"+result);
-              resolve(result); // Resolve the outer promise with the result from A
+              resolve(result);
             })
             .catch(error => {
-              reject(error); // Reject the outer promise if function A fails
+              reject(error);
             });
         } else {
           reject(new Error('Failed to fetch data')); // Reject the outer promise if fetching data fails
