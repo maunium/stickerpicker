@@ -1,0 +1,15 @@
+{
+  "packs": [
+      "scalar-isabella.json",
+      "scalar-privacy_pam.json",
+      "scalar-sheltie.json",
+      "scalar-stakey.json",
+      "scalar-videoplasty.json",
+      "scalar-geeko.json",
+      "scalar-loading_artist.json",
+      "scalar-rabbit.json",
+      "scalar-smilies.json",
+      "scalar-stickman.json"
+  ],
+  "homeserver_url": "https://matrix.intothematrix.in"
+}

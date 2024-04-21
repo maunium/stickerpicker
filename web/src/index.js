@@ -18,6 +18,7 @@ import { Spinner } from "./spinner.js"
 import { SearchBox } from "./search-box.js"
 import * as widgetAPI from "./widget-api.js"
 import * as frequent from "./frequently-used.js"
+// import GiphyAPI from "./GiphySearch.js"
 
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
@@ -47,11 +48,107 @@ const defaultState = {
 	},
 }
 
+class GiphySearchTab extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchTerm: "",
+      gifs: [],
+      loading: false,
+      GIFById: {},
+    };
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.searchGifs = this.searchGifs.bind(this);
+    this.handleGifClick = this.handleGifClick.bind(this);
+  }
+
+  async searchGifs() {
+    this.setState({ loading: true });
+    try {
+    const apiKey = "Gc7131jiJuvI7IdN0HZ1D7nh0ow5BU6g";
+    const url = `https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${apiKey}`;
+    this.setState({ loading: true });
+    const response = await fetch(url);
+    const data = await response.json();
+    this.setState({ gifs: data.data, loading: false });
+    data.data.forEach((jsonElement) => {
+        const id = jsonElement.id;
+        const updatedItem = {
+            "body": jsonElement.title,
+            "info": {
+                "h": jsonElement.images.original.height,
+                "w": jsonElement.images.original.width,
+                "size": jsonElement.images.original.size,
+                "mimetype": "image/gif",
+                "thumbnail_info": {
+                    "h": jsonElement.images.fixed_width_still.height,
+                    "mimetype": "image/jpg",
+                    "size": jsonElement.images.fixed_width_still.size,
+                    "w": jsonElement.images.fixed_width_still.width
+                },
+                "thumbnail_url": jsonElement.images.fixed_width_still.url
+            },
+           "msgtype": "m.image",
+           "url": jsonElement.images.original.url
+        };
+        this.setState((prevState) => ({ 
+            GIFById: {...prevState.GIFById, [id]: updatedItem}}));
+    });
+  } catch (error) {
+    this.setState({ error: "Error fetching GIFs", loading: false });
+    this.setState({ loading: false });
+    }
+  }
+
+  handleSearchChange(event) {
+    this.setState({ searchTerm: event.target.value });
+  }
+
+  handleGifClick(gif) {
+    console.log(this.state.GIFById[gif.id]);
+    widgetAPI.sendGIF(this.state.GIFById[gif.id]);
+  }
+  async searchGiphy(searchTerm) {
+  if (!searchTerm) return;
+
+};
+
+  render() {
+    const { searchTerm, gifs, loading } = this.state;
+
+    return html`
+        <div class="search-box">
+          <input
+            type="text"
+            value=${searchTerm}
+            onInput=${this.handleSearchChange}
+            placeholder="Search GIFs..."
+          />
+          <button onClick=${this.searchGifs} disabled=${loading}>Search</button>
+        </div>
+          <!-- <div class="gifs-list" style="display: grid"> -->
+        <div class="pack-list">
+          <section class="stickerpack">
+              <div class="sticker-list">
+          ${gifs.map((gif) => html`
+            <div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
+              <img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
+            </div>
+          `)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+
 class App extends Component {
 	constructor(props) {
 		super(props)
 		this.defaultTheme = params.get("theme")
 		this.state = {
+            activeTab: "stickers",
 			packs: defaultState.packs,
 			loading: true,
 			error: null,
@@ -266,35 +363,51 @@ class App extends Component {
 	}
 
 	render() {
-		const theme = `theme-${this.state.theme}`
-		const filterActive = !!this.state.filtering.searchTerm
-		const packs = filterActive ? this.state.filtering.packs : [this.state.frequentlyUsed, ...this.state.packs]
+    const theme = `theme-${this.state.theme}`;
+    const filterActive = !!this.state.filtering.searchTerm;
+    const packs = filterActive
+      ? this.state.filtering.packs
+      : [this.state.frequentlyUsed, ...this.state.packs];
 
-		if (this.state.loading) {
-			return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`
-		} else if (this.state.error) {
-			return html`<main class="error ${theme}">
-				<h1>Failed to load packs</h1>
-				<p>${this.state.error}</p>
-			</main>`
-		} else if (this.state.packs.length === 0) {
-			return html`<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`
-		}
+    if (this.state.loading) {
+      return html`<main class="spinner ${theme}"><${Spinner} size=${80} green /></main>`;
+    } else if (this.state.error) {
+      return html`<main class="error ${theme}">
+        <h1>Failed to load packs</h1>
+        <p>${this.state.error}</p>
+      </main>`;
+    } else if (this.state.packs.length === 0) {
+      return html`<main class="empty ${theme}"><h1>No packs found 😿</h1></main>`;
+    }
 
-		return html`<main class="has-content ${theme}">
-			<nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
-				<${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
-				${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
-				<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
-			</nav>
-			<${SearchBox} onKeyUp=${this.searchStickers} />
-			<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${elem => this.packListRef = elem}>
-				${filterActive && packs.length === 0 ? html`<div class="search-empty"><h1>No stickers match your search</h1></div>` : null}
-				${packs.map(pack => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
-				<${Settings} app=${this}/>
-			</div>
-		</main>`
-	}
+    return html`<main class="has-content ${theme}">
+        <div class="tab-container">
+        <a href="#stickers" class="tab" onClick=${() => this.setState({ activeTab: "stickers" })}>Stickers</a>
+        <a href="#gifs" class="tab" onClick=${() => this.setState({ activeTab: "gifs" })}>GIFs</a>
+        </div>
+
+      ${this.state.activeTab === "stickers" && html`
+        <nav onWheel=${this.navScroll} ref=${elem => this.navRef = elem}>
+            <${NavBarItem} pack=${this.state.frequentlyUsed} iconOverride="recent" />
+			${this.state.packs.map(pack => html`<${NavBarItem} id=${pack.id} pack=${pack}/>`)}
+			<${NavBarItem} pack=${{ id: "settings", title: "Settings" }} iconOverride="settings" />
+        </nav>
+
+        <${SearchBox} onKeyUp=${this.searchStickers} />
+        <div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${(elem) => (this.packListRef = elem)}>
+        ${filterActive && packs.length === 0
+          ? html`<div class="search-empty"><h1>No stickers match your search</h1></div>`
+          : null}
+        ${packs.map((pack) => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker} />`)}
+        <${Settings} app=${this} />
+      </div>
+
+      `}
+      ${this.state.activeTab === "gifs" && html`
+        <${GiphySearchTab} send=${this.sendGIF} />
+      `}
+    </main>`;
+  }
 }
 
 const Settings = ({ app }) => html`
