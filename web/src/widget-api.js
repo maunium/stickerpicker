@@ -43,36 +43,62 @@ export function sendSticker(content){
     api.sendSticker(data);
 }
 
-export function sendGIF(content){
-    // just print out content, should be URL
+/*
+ *export function sendGIF(content){
+ *    // just print out content, should be URL
+ *    console.log("Content:"+content.url);
+ *    return new Promise((resolve, reject) => {
+ *    const xhr = new XMLHttpRequest();
+ *    xhr.open('GET', content.url, true);
+ *    xhr.onreadystatechange = function() {
+ *      if (xhr.readyState === 4) {
+ *        if (xhr.status === 200) {
+ *          const responseData = xhr.responseText;
+ *          // Call uploadFile with response data
+ *          api.uploadFile(responseData)
+ *            .then(result => {
+ *                console.log("Here's the result:"+result.content_uri);
+ *                // mess around with the content object, then send it as sticker
+ *                content.url = result.content_uri;
+ *                sendSticker(content);
+ *              resolve(result);
+ *            })
+ *            .catch(error => {
+ *              reject(error);
+ *            });
+ *        } else {
+ *          reject(new Error('Failed to fetch data')); // Reject the outer promise if fetching data fails
+ *        }
+ *      }
+ *    };
+ *    xhr.send();
+ *  }); 
+ *}
+ */
+
+export async function sendGIF(content){
+    // just print content, since it's a custom type with URL
     console.log("Content:"+content.url);
-    return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', content.url, true);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          const responseData = xhr.responseText;
-          // Call uploadFile with response data
-          api.uploadFile(responseData)
-            .then(result => {
-                console.log("Here's the result:"+result.content_uri);
-                // mess around with the content object, then send it as sticker
-                content.url = result.content_uri;
-                sendSticker(content);
-              resolve(result);
-            })
-            .catch(error => {
-              reject(error);
-            });
-        } else {
-          reject(new Error('Failed to fetch data')); // Reject the outer promise if fetching data fails
-        }
-      }
-    };
-    xhr.send();
-  }); 
+    // use fetch because I'm on IE
+    const lol = await fetch(content.url);
+    const uri_file = await lol.blob();
+    // call uploadFile with this
+    var result = await api.uploadFile(uri_file)
+    console.log("Got URI:"+result.content_uri);
+    content.url = result.content_uri;
+    // get thumbnail
+    //const thumb_uri = await fetch(content.info.thumbnail_url)
+    //const thumb_file = await thumb_uri.blob();
+    //result = await api.uploadFile(thumb_file)
+    //console.log("Thumb URI:"+result.content_uri);
+    //content.info.thumbnail_url = result.content_uri;
+    // actually, just delete the thumbnail
+    delete content.info.thumbnail_url;
+    // finally, send it as sticker
+    sendSticker(content);
+
 }
+
 
 /*
  *let widgetId = null
