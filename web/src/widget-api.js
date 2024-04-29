@@ -14,31 +14,41 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const widgetId = null; // if you know the widget ID, supply it.
-const api = new mxwidgets.WidgetApi(widgetId);
+const urlParams = new URLSearchParams(window.location.search);
+const widgetId = urlParams.get('widgetId'); // if you know the widget ID, supply it.
+console.log("Widget ID:"+widgetId);
+const api = new mxwidgets.WidgetApi(widgetId, '*');
 
 
 // Before doing anything else, request capabilities:
 api.requestCapabilities(mxwidgets.StickerpickerCapabilities);
 api.requestCapability(mxwidgets.MatrixCapabilities.MSC4039UploadFile);
 
+api.on("ready", () => {console.log("ready event received")});
 
 // Start the messaging
 api.start();
 
 // If waitForIframeLoad is false, tell the client that we're good to go
-api.sendContentLoaded();
+//api.sendContentLoaded();
 
 export function sendSticker(content){
-    api.sendSticker(content);
+    const data = {
+        content: {...content},
+        name: content.body,
+    };
+    // do the same thing that tulir does
+    delete data.content.id;
+    // send data
+    api.sendSticker(data);
 }
 
-export function sendGIF(url){
+export function sendGIF(content){
     // just print out content, should be URL
-    console.log("Content:"+url.url);
+    console.log("Content:"+content.url);
     return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', url.url, true);
+    xhr.open('GET', content.url, true);
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
@@ -46,7 +56,10 @@ export function sendGIF(url){
           // Call uploadFile with response data
           api.uploadFile(responseData)
             .then(result => {
-                console.log("Here's the result:"+result);
+                console.log("Here's the result:"+result.content_uri);
+                // mess around with the content object, then send it as sticker
+                content.url = result.content_uri;
+                sendSticker(content);
               resolve(result);
             })
             .catch(error => {
