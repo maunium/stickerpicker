@@ -31,6 +31,7 @@ if (params.has('config')) {
 }
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
+let GIPHY_API_KEY = ""
 
 const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
 
@@ -66,7 +67,8 @@ class GiphySearchTab extends Component {
   async searchGifs() {
     this.setState({ loading: true });
     try {
-    const apiKey = "Gc7131jiJuvI7IdN0HZ1D7nh0ow5BU6g";
+    // const apiKey = "Gc7131jiJuvI7IdN0HZ1D7nh0ow5BU6g";
+    const apiKey = GIPHY_API_KEY;
     const url = `https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${apiKey}`;
     this.setState({ loading: true });
     const response = await fetch(url);
@@ -131,7 +133,7 @@ class GiphySearchTab extends Component {
         <div class="pack-list">
           <section class="stickerpack">
               <div class="sticker-list">
-          ${gifs.map((gif) => html`
+          ${GIPHY_API_KEY !== "" && gifs.map((gif) => html`
             <div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
               <img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
             </div>
@@ -262,6 +264,7 @@ class App extends Component {
 			}
 			const indexData = await indexRes.json()
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
+            GIPHY_API_KEY = indexData.giphy_api_key || ""
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
 				let packRes
@@ -404,9 +407,12 @@ class App extends Component {
       </div>
 
       `}
-      ${this.state.activeTab === "gifs" && html`
+      ${this.state.activeTab === "gifs" && GIPHY_API_KEY !== "" && html`
         <${GiphySearchTab} send=${this.sendGIF} />
       `}
+      ${this.state.activeTab === "gifs" && GIPHY_API_KEY === "" && html`
+        <h1><center>GIF Search is not enabled. Please enable it in the config.</center></h1>
+        `}
     </main>`;
   }
 }

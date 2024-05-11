@@ -55,10 +55,12 @@ async def load_config(path: str) -> None:
             config = json.load(config_file)
             homeserver_url = config["homeserver"]
             access_token = config["access_token"]
+            giphy_api_key = config["giphy_api_key"]
     except FileNotFoundError:
-        print("Matrix config file not found. Please enter your homeserver and access token.")
+        print("Matrix config file not found. Please enter your homeserver and access token. Enter the Giphy API token if required, leave blank to disable the gif picker.")
         homeserver_url = input("Homeserver URL: ")
         access_token = input("Access token: ")
+        giphy_api_key = input("Giphy API key: ")
         whoami_url = URL(homeserver_url) / "_matrix" / "client" / "r0" / "account" / "whoami"
         if whoami_url.scheme not in ("https", "http"):
             whoami_url = whoami_url.with_scheme("https")
@@ -67,7 +69,8 @@ async def load_config(path: str) -> None:
             json.dump({
                 "homeserver": homeserver_url,
                 "user_id": user_id,
-                "access_token": access_token
+                "access_token": access_token,
+                "giphy_api_key": giphy_api_key
             }, config_file)
         print(f"Wrote config to {path}")
 
