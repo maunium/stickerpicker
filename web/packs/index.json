@@ -1,14 +1,15 @@
 {
   "packs": [
-    "DEVINsOpPaCk.json",
-    "TrollFaceStiVIGI.json",
-    "ult_1830433410_3.json",
-    "pepe_frog.json",
-    "Shinchanbygojo_by_fStikBot.json",
-    "Kaguya_sama_WWA_TV2.json",
-    "Hyper_cats.json",
-    "K10f1b91219abafa4cc4a_by_StickerStealRobot.json",
-    "mylittleanimestickerpack.json"
+      "scalar-isabella.json",
+      "scalar-privacy_pam.json",
+      "scalar-sheltie.json",
+      "scalar-stakey.json",
+      "scalar-videoplasty.json",
+      "scalar-geeko.json",
+      "scalar-loading_artist.json",
+      "scalar-rabbit.json",
+      "scalar-smilies.json",
+      "scalar-stickman.json"
   ],
   "homeserver_url": "https://matrix.intothematrix.in",
   "giphy_api_key": "Gc7131jiJuvI7IdN0HZ1D7nh0ow5BU6g"
