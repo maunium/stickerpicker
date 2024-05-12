@@ -385,7 +385,7 @@ class App extends Component {
     }
 
     return html`<main class="has-content ${theme}">
-        <div class="tab-container">
+        <div class="tab-container" style="display: flex;">
         <a href="#stickers" class="tab" onClick=${() => this.setState({ activeTab: "stickers" })}>Stickers</a>
         <a href="#gifs" class="tab" onClick=${() => this.setState({ activeTab: "gifs" })}>GIFs</a>
         </div>

@@ -11,5 +11,6 @@
       "scalar-smilies.json",
       "scalar-stickman.json"
   ],
-  "homeserver_url": "https://matrix.intothematrix.in"
+  "homeserver_url": "https://matrix.intothematrix.in",
+  "giphy_api_key": "Gc7131jiJuvI7IdN0HZ1D7nh0ow5BU6g"
 }
