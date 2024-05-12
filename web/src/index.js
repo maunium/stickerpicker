@@ -32,7 +32,7 @@ if (params.has('config')) {
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
 let GIPHY_API_KEY = ""
-let GIPHY_HOMESERVER = "mxc://giphy.mau.dev/"
+let GIPHY_MXC_PREFIX = "mxc://giphy.mau.dev/"
 
 const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/r0/thumbnail/${mxc.substr(6)}?height=128&width=128&method=scale`
 
@@ -69,7 +69,7 @@ class GiphySearchTab extends Component {
     this.setState({ loading: true });
     try {
     const apiKey = GIPHY_API_KEY;
-    const gif_homeserver = GIPHY_HOMESERVER;
+    const mxc_prefix = GIPHY_MXC_PREFIX;
     const url = `https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${apiKey}`;
     this.setState({ loading: true });
     const response = await fetch(url);
@@ -83,16 +83,10 @@ class GiphySearchTab extends Component {
                 "h": jsonElement.images.original.height,
                 "w": jsonElement.images.original.width,
                 "size": jsonElement.images.original.size,
-                "mimetype": "image/gif",
-                "thumbnail_info": {
-                    "h": jsonElement.images.fixed_width_still.height,
-                    "mimetype": "image/jpg",
-                    "size": jsonElement.images.fixed_width_still.size,
-                    "w": jsonElement.images.fixed_width_still.width
-                },
+                "mimetype": "image/webp",
             },
            "msgtype": "m.image",
-           "url": gif_homeserver+jsonElement.id
+           "url": mxc_prefix+jsonElement.id
         };
         this.setState((prevState) => ({ 
             GIFById: {...prevState.GIFById, [id]: updatedItem}}));
@@ -265,7 +259,7 @@ class App extends Component {
 			const indexData = await indexRes.json()
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
             GIPHY_API_KEY = indexData.giphy_api_key || ""
-            GIPHY_HOMESERVER = indexData.giphy_homeserver || GIPHY_HOMESERVER
+            GIPHY_MXC_PREFIX = indexData.giphy_mxc_prefix || GIPHY_MXC_PREFIX
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
 				let packRes
@@ -386,22 +380,6 @@ class App extends Component {
     }
 
     return html`<main class="has-content ${theme}">
-        <style>
-            a.tab {
-                padding: 5% 5%;
-                width: 40%;
-                text-align: center;
-                border: none;
-                background-color: #f0f0f0;
-                cursor: pointer;
-                -webkit-appearance: button;
-                -moz-appearance: button;
-                appearance: button;
-
-                text-decoration: none;
-                color: initial;
-        }
-        </style>
         <div class="tab-container" style="display: flex;">
         <a href="#stickers" class="tab" onClick=${() => this.setState({ activeTab: "stickers" })}>Stickers</a>
         <a href="#gifs" class="tab" onClick=${() => this.setState({ activeTab: "gifs" })}>GIFs</a>
