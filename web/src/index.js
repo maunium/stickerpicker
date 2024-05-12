@@ -92,7 +92,7 @@ class GiphySearchTab extends Component {
                 },
             },
            "msgtype": "m.image",
-           "url": gif_homeserver+jsonElement.id+".gif"
+           "url": gif_homeserver+jsonElement.id
         };
         this.setState((prevState) => ({ 
             GIFById: {...prevState.GIFById, [id]: updatedItem}}));
