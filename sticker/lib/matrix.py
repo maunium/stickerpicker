@@ -56,6 +56,7 @@ async def load_config(path: str) -> None:
             homeserver_url = config["homeserver"]
             access_token = config["access_token"]
             giphy_api_key = config["giphy_api_key"]
+            giphy_homeserver = config["giphy_homeserver"]
     except FileNotFoundError:
         print("Matrix config file not found. Please enter your homeserver and access token. Enter the Giphy API token if required, leave blank to disable the gif picker.")
         homeserver_url = input("Homeserver URL: ")
