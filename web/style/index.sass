@@ -71,11 +71,22 @@ main.theme-dark
   --text-color: white
   background-color: #22262e
 
+  .icon.icon-giphy
+    background-image: url(../res/giphy-dark.svg)
+
 main.theme-black
   --highlight-color: #222
   --search-box-color: var(--highlight-color)
   --text-color: white
   background-color: black
+
+  .icon.icon-giphy
+    background-image: url(../res/giphy-dark.svg)
+
+div.powered-by-giphy
+  padding: 1rem
+  > img
+    width: 100%
 
 .icon
   width: 100%
@@ -94,6 +105,10 @@ main.theme-black
 
   &.icon.icon-search
     --icon-image: url(../res/search.svg)
+
+  &.icon.icon-giphy
+    background: center / contain no-repeat url(../res/giphy-light.svg)
+    mask: unset
 
 nav
   display: flex
@@ -139,6 +154,12 @@ section.stickerpack
 
   > h1
     margin: 0 0 0 .75rem
+
+section.stickerpack#pack-giphy
+  display: flex
+  justify-content: space-between
+  flex-direction: column
+  min-height: 100%
 
 div.sticker
   display: flex

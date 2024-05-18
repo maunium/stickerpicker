@@ -13,13 +13,13 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { html } from "../lib/htm/preact.js"
+import {html} from "../lib/htm/preact.js"
 
-export const SearchBox = ({ onKeyUp, placeholder = 'Find stickers' }) => {
+export const SearchBox = ({onInput, onKeyUp, value, placeholder = 'Find stickers'}) => {
 	const component = html`
 		<div class="search-box">
-			<input type="text" placeholder=${placeholder} onKeyUp=${onKeyUp} />
-			<span class="icon icon-search" />
+			<input type="text" placeholder=${placeholder} value=${value} onInput=${onInput} onKeyUp=${onKeyUp}/>
+			<span class="icon icon-search"/>
 		</div>
 	`
 	return component

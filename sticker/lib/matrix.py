@@ -55,10 +55,23 @@ async def load_config(path: str) -> None:
             config = json.load(config_file)
             homeserver_url = config["homeserver"]
             access_token = config["access_token"]
+            try:
+                giphy_api_key = config["giphy_api_key"]
+                giphy_mxc_prefix = config["giphy_mxc_prefix"]
+            except KeyError:
+                # these two are not mandatory, assume GIF search is disabled
+                print("Giphy related parameters not found in the config file.")
     except FileNotFoundError:
         print("Matrix config file not found. Please enter your homeserver and access token.")
         homeserver_url = input("Homeserver URL: ")
         access_token = input("Access token: ")
+        print("If you want to enable GIF search, enter your giphy API key. Otherwise, leave it empty.")
+        giphy_api_key = input("Giphy API key: ").strip()
+        giphy_mxc_prefix = "mxc://giphy.mau.dev/"
+        if giphy_api_key:
+            print("If you want to self-host the matrix->giphy proxy, enter the mxc URI prefix here")
+            print("Defaults to mxc://giphy.mau.dev/ if left empty.")
+            giphy_mxc_prefix = input("Giphy MXC prefix: ").strip() or giphy_mxc_prefix
         whoami_url = URL(homeserver_url) / "_matrix" / "client" / "r0" / "account" / "whoami"
         if whoami_url.scheme not in ("https", "http"):
             whoami_url = whoami_url.with_scheme("https")
@@ -67,7 +80,9 @@ async def load_config(path: str) -> None:
             json.dump({
                 "homeserver": homeserver_url,
                 "user_id": user_id,
-                "access_token": access_token
+                "access_token": access_token,
+                "giphy_api_key": giphy_api_key,
+                "giphy_mxc_prefix": giphy_mxc_prefix,
             }, config_file)
         print(f"Wrote config to {path}")
 

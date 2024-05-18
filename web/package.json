@@ -11,9 +11,9 @@
     "sass": "sass --no-source-map --style=compressed style/"
   },
   "dependencies": {
+    "esinstall": "^1.1.7",
     "htm": "^3.1.0",
     "preact": "^10.5.14",
-    "esinstall": "^1.1.7",
     "sass": "^1.42.1"
   }
 }
