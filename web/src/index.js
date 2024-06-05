@@ -166,7 +166,9 @@ class App extends Component {
 			}
 			const indexData = await indexRes.json()
 			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
-			setGiphyAPIKey(indexData.giphy_api_key, indexData.giphy_mxc_prefix)
+			if (indexData.giphy_api_key !== undefined) {
+				setGiphyAPIKey(indexData.giphy_api_key, indexData.giphy_mxc_prefix)
+			}
 			// TODO only load pack metadata when scrolled into view?
 			for (const packFile of indexData.packs) {
 				let packRes
