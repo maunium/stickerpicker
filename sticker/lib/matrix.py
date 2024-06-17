@@ -68,8 +68,6 @@ async def load_config(path: str) -> None:
                 "homeserver": homeserver_url,
                 "user_id": user_id,
                 "access_token": access_token,
-                "giphy_api_key": giphy_api_key,
-                "giphy_mxc_prefix": giphy_mxc_prefix,
             }, config_file)
         print(f"Wrote config to {path}")
 
