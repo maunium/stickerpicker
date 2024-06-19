@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"time"
 
 	"go.mau.fi/util/exerrors"
 	"gopkg.in/yaml.v3"
@@ -53,6 +54,13 @@ func main() {
 }
 
 func getMedia(_ context.Context, id string) (response mediaproxy.GetMediaResponse, err error) {
+	// This is not related to giphy, but random cats are always fun
+	if id == "cat" {
+		return &mediaproxy.GetMediaResponseURL{
+			URL:       "https://cataas.com/cat",
+			ExpiresAt: time.Now(),
+		}, nil
+	}
 	if !giphyIDRegex.MatchString(id) {
 		return nil, mediaproxy.ErrInvalidMediaIDSyntax
 	}
