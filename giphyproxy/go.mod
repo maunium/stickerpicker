@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	go.mau.fi/util v0.5.0
 	gopkg.in/yaml.v3 v3.0.1
-	maunium.net/go/mautrix v0.19.0-beta.1.0.20240619091941-bd2c40e815bd
+	maunium.net/go/mautrix v0.19.0-beta.1.0.20240619092812-451658374280
 )
 
 require (
