@@ -49,6 +49,7 @@ func main() {
 		var cfg Config
 		exerrors.PanicIfNotNil(yaml.Unmarshal(cfgFile, &cfg))
 		mp := exerrors.Must(mediaproxy.NewFromConfig(cfg.BasicConfig, getMedia))
+		mp.KeyServer.Version.Name = "maunium-stickerpicker giphy proxy"
 		exerrors.PanicIfNotNil(mp.Listen(cfg.ServerConfig))
 	}
 }
