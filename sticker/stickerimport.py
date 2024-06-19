@@ -56,10 +56,6 @@ def add_meta(document: Document, info: matrix.StickerInfo, pack: StickerSetFull)
 
 
 async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir: str) -> None:
-    if pack.set.animated:
-        print("Animated stickerpacks are currently not supported")
-        return
-
     pack_path = os.path.join(output_dir, f"{pack.set.short_name}.json")
     try:
         os.mkdir(os.path.dirname(pack_path))
