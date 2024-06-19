@@ -68,9 +68,9 @@ export class GiphySearchTab extends Component {
 		widgetAPI.sendSticker({
 			"body": gif.title,
 			"info": {
-				"h": gif.images.original.height,
-				"w": gif.images.original.width,
-				"size": gif.images.original.size,
+				"h": +gif.images.original.height,
+				"w": +gif.images.original.width,
+				"size": +gif.images.original.size,
 				"mimetype": "image/webp",
 			},
 			"msgtype": "m.image",
