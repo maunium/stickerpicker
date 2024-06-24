@@ -150,6 +150,7 @@ class App extends Component {
 		this.setState({
 			packs: defaultState.packs,
 			filtering: defaultState.filtering,
+			loading: true,
 		})
 		this._loadPacks(true)
 	}
