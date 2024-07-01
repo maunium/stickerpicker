@@ -36,13 +36,13 @@ export class GiphySearchTab extends Component {
 	async makeGifSearchRequest() {
 		try {
 			this.setState({gifs: [], loading: true})
-			const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
-			// TODO handle error responses properly?
-			const data = await resp.json()
-			if (data.data.length === 0) {
-				this.setState({gifs: [], error: "No results", loading: false})
-			} else {
-				this.setState({gifs: data.data, error: null, loading: false})
+			try {
+				const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
+				const { data: gifs, meta } = await resp.json()
+				const error = meta.msg !== 'OK' ? `An issue happened, please try again (${meta.msg})` : null
+				this.setState({gifs, error, loading: false})
+			} catch (e) {
+				this.setState({gifs: [], error: `An issue happened, please try again (${e.message})`, loading: false})
 			}
 		} catch (error) {
 			this.setState({error})
@@ -91,9 +91,12 @@ export class GiphySearchTab extends Component {
 					${this.state.loading ?
 						html`<${Spinner} size=${80} green/>` :
 						html`
-							<div class="error">
+							<div class="search-error">
 								${this.state.error}
 							</div>
+							${this.state.searchTerm && this.state.gifs.length === 0 && !this.state.error && !this.state.loading
+								? html`<div class="search-empty">No GIFs match your search</div>`
+								: null}
 							<div class="sticker-list">
 								${this.state.gifs.map((gif) => html`
 									<div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
