@@ -1,5 +1,6 @@
 import {Component, html} from "../lib/htm/preact.js";
 import * as widgetAPI from "./widget-api.js";
+import {Spinner} from "./spinner.js";
 import {SearchBox} from "./search-box.js";
 
 const GIPHY_SEARCH_DEBOUNCE = 1000
@@ -34,13 +35,14 @@ export class GiphySearchTab extends Component {
 
 	async makeGifSearchRequest() {
 		try {
+			this.setState({gifs: [], loading: true})
 			const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
 			// TODO handle error responses properly?
 			const data = await resp.json()
 			if (data.data.length === 0) {
-				this.setState({gifs: [], error: "No results"})
+				this.setState({gifs: [], error: "No results", loading: false})
 			} else {
-				this.setState({gifs: data.data, error: null})
+				this.setState({gifs: data.data, error: null, loading: false})
 			}
 		} catch (error) {
 			this.setState({error})
@@ -82,24 +84,27 @@ export class GiphySearchTab extends Component {
 	}
 
 	render() {
-		// TODO display loading state?
 		return html`
 			<${SearchBox} onInput=${this.updateGifSearchQuery} onKeyUp=${this.searchKeyUp} value=${this.state.searchTerm} placeholder="Find GIFs"/>
 			<div class="pack-list">
 				<section class="stickerpack" id="pack-giphy">
-					<div class="error">
-						${this.state.error}
-					</div>
-					<div class="sticker-list">
-						${this.state.gifs.map((gif) => html`
-							<div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
-								<img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
+					${this.state.loading ?
+						html`<${Spinner} size=${80} green/>` :
+						html`
+							<div class="error">
+								${this.state.error}
 							</div>
-						`)}
-					</div>
-					<div class="footer powered-by-giphy">
-						<img src="./res/powered-by-giphy.png" alt="Powered by GIPHY"/>
-					</div>
+							<div class="sticker-list">
+								${this.state.gifs.map((gif) => html`
+									<div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
+										<img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
+									</div>
+								`)}
+							</div>
+							<div class="footer powered-by-giphy">
+								<img src="./res/powered-by-giphy.png" alt="Powered by GIPHY"/>
+							</div>
+					`}
 				</section>
 			</div>
 		`
