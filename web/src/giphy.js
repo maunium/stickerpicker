@@ -25,6 +25,7 @@ export class GiphySearchTab extends Component {
 			searchTerm: "",
 			gifs: [],
 			loading: false,
+			debouncing: false,
 			error: null,
 		}
 		this.handleGifClick = this.handleGifClick.bind(this)
@@ -35,7 +36,7 @@ export class GiphySearchTab extends Component {
 
 	async makeGifSearchRequest() {
 		try {
-			this.setState({gifs: [], loading: true})
+			this.setState({gifs: [], debouncing: false, loading: true})
 			try {
 				const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
 				const { data: gifs, meta } = await resp.json()
@@ -61,7 +62,7 @@ export class GiphySearchTab extends Component {
 	}
 
 	updateGifSearchQuery(event) {
-		this.setState({searchTerm: event.target.value})
+		this.setState({searchTerm: event.target.value, debouncing: true})
 		clearTimeout(this.searchTimeout)
 		this.searchTimeout = setTimeout(() => this.makeGifSearchRequest(), GIPHY_SEARCH_DEBOUNCE)
 	}
@@ -85,7 +86,13 @@ export class GiphySearchTab extends Component {
 
 	render() {
 		return html`
-			<${SearchBox} onInput=${this.updateGifSearchQuery} onKeyUp=${this.searchKeyUp} value=${this.state.searchTerm} placeholder="Find GIFs"/>
+			<${SearchBox}
+				onInput=${this.updateGifSearchQuery}
+				onKeyUp=${this.searchKeyUp}
+				value=${this.state.searchTerm}
+				loading=${this.state.debouncing}
+				placeholder="Find GIFs"
+			/>
 			<div class="pack-list">
 				<section class="stickerpack" id="pack-giphy">
 					${this.state.loading ?
