@@ -325,7 +325,7 @@ class App extends Component {
 					<${SearchBox} onInput=${this.searchStickers} value=${this.state.filtering.searchTerm ?? ""}/>
 					<div class="pack-list ${isMobileSafari ? "ios-safari-hack" : ""}" ref=${(elem) => (this.packListRef = elem)}>
 						${filterActive && packs.length === 0
-							? html`<div class="search-empty"><h1>No stickers match your search</h1></div>`
+							? html`<div class="search-empty">No stickers match your search</div>`
 							: null}
 						${packs.map((pack) => html`<${Pack} id=${pack.id} pack=${pack} send=${this.sendSticker}/>`)}
 						<${Settings} app=${this}/>
