@@ -77,7 +77,7 @@ async def upload_sticker(file: str, directory: str, old_stickers: Dict[str, matr
         }
         print(f".. using existing upload")
     else:
-        image_data, mimetype, width, height = util.convert_image(image_data)
+        image_data, mimetype, width, height = util.convert_sticker(image_data)
         print(".", end="", flush=True)
         mxc = await matrix.upload(image_data, mimetype, file)
         print(".", end="", flush=True)

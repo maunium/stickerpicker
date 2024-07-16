@@ -76,16 +76,42 @@ def _convert_image(data: bytes) -> (bytes, int, int):
     return new_file.getvalue(), w, h
 
 
-def convert_image(data: bytes) -> (bytes, str, int, int):
+def _convert_sticker(data: bytes) -> (bytes, str, int, int):
     mimetype = guess_mime(data)
     if mimetype.startswith("video/"):
         data = video_to_gif(data, mimetype)
         print(".", end="", flush=True)
         mimetype = "image/gif"
+    elif mimetype.startswith("application/gzip"):
+        print(".", end="", flush=True)
+        # unzip file
+        import gzip
+        with gzip.open(BytesIO(data), "rb") as f:
+            data = f.read()
+            mimetype = guess_mime(data)
+            suffix = mimetypes.guess_extension(mimetype)
+            with tempfile.NamedTemporaryFile(suffix=suffix) as temp:
+                temp.write(data)
+                with tempfile.NamedTemporaryFile(suffix=".gif") as gif:
+                    # run lottie_convert.py input output
+                    print(".", end="", flush=True)
+                    import subprocess
+                    cmd = ["lottie_convert.py", temp.name, gif.name]
+                    result = subprocess.run(cmd, capture_output=True, text=True)
+                    if result.returncode != 0:
+                        raise RuntimeError(f"Run {cmd} failed with code {retcode}, Error occurred:\n{result.stderr}")
+                    gif.seek(0)
+                    data = gif.read()
+                    mimetype = "image/gif"
+    rlt = _convert_image(data)
+    return  rlt[0], mimetype, rlt[1], rlt[2]
+
+
+def convert_sticker(data: bytes) -> (bytes, str, int, int):
     try:
-        rlt = _convert_image(data)
-        return  rlt[0], mimetype, rlt[1], rlt[2]
+        return _convert_sticker(data)
     except Exception as e:
+        mimetype = guess_mime(data)
         print(f"Error converting image, mimetype: {mimetype}")
         ext = mimetypes.guess_extension(mimetype)
         with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp:
