@@ -25,7 +25,7 @@ try:
 except ImportError:
     print("[Warning] Magic is not installed, using file extensions to guess mime types")
     magic = None
-from PIL import Image
+from PIL import Image, ImageSequence
 
 from . import matrix
 
@@ -60,11 +60,33 @@ def video_to_gif(data: bytes, mime: str) -> bytes:
             return gif.read()
 
 
-def _convert_image(data: bytes) -> (bytes, int, int):
-    image: Image.Image = Image.open(BytesIO(data)).convert("RGBA")
+def _convert_image(data: bytes, mimetype: str) -> (bytes, int, int):
+    image: Image.Image = Image.open(BytesIO(data))
     new_file = BytesIO()
-    image.save(new_file, "png")
-    w, h = image.size
+    suffix = mimetypes.guess_extension(mimetype)
+    if suffix:
+        suffix = suffix[1:]
+    # Determine if the image is a GIF
+    is_animated = getattr(image, "is_animated", False)
+    if is_animated:
+        frames = [frame.convert("RGBA") for frame in ImageSequence.Iterator(image)]
+        # Save the new GIF
+        frames[0].save(
+            new_file,
+            format='GIF',
+            save_all=True,
+            append_images=frames[1:],
+            loop=image.info.get('loop', 0),  # Default loop to 0 if not present
+            duration=image.info.get('duration', 100),  # Set a default duration if not present
+            transparency=image.info.get('transparency', 255),  # Default to 255 if transparency is not present
+            disposal=image.info.get('disposal', 2)  # Default to disposal method 2 (restore to background)
+        )
+        # Get the size of the first frame to determine resizing
+        w, h = frames[0].size
+    else:
+        image = image.convert("RGBA")
+        image.save(new_file, format=suffix)
+        w, h = image.size
     if w > 256 or h > 256:
         # Set the width and height to lower values so clients wouldn't show them as huge images
         if w > h:
@@ -103,7 +125,8 @@ def _convert_sticker(data: bytes) -> (bytes, str, int, int):
                     gif.seek(0)
                     data = gif.read()
                     mimetype = "image/gif"
-    rlt = _convert_image(data)
+    rlt = _convert_image(data, mimetype)
+    suffix = mimetypes.guess_extension(mimetype)
     return  rlt[0], mimetype, rlt[1], rlt[2]
 
 
