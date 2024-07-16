@@ -40,7 +40,7 @@ def guess_mime(data: bytes) -> str:
         except Exception:
             pass
     else:
-        with tempfile.NamedTemporaryFile(delete=False) as temp:
+        with tempfile.NamedTemporaryFile() as temp:
             temp.write(data)
             temp.close()
             mime, _ = mimetypes.guess_type(temp.name)
@@ -48,12 +48,26 @@ def guess_mime(data: bytes) -> str:
 
 
 def video_to_gif(data: bytes, mime: str) -> bytes:
-    from moviepy.editor import VideoFileClip
     ext = mimetypes.guess_extension(mime)
+    if mime.startswith("video/"):
+        # run ffmpeg to fix duration
+        with tempfile.NamedTemporaryFile(suffix=ext) as temp:
+            temp.write(data)
+            temp.flush()
+            with tempfile.NamedTemporaryFile(suffix=ext) as temp_fixed:
+                import subprocess
+                print(".", end="", flush=True)
+                result = subprocess.run(["ffmpeg", "-y", "-i", temp.name, "-codec", "copy", temp_fixed.name],
+                                        capture_output=True)
+                if result.returncode != 0:
+                    raise RuntimeError(f"Run ffmpeg failed with code {result.returncode}, Error occurred:\n{result.stderr}")
+                temp_fixed.seek(0)
+                data = temp_fixed.read()
     with tempfile.NamedTemporaryFile(suffix=ext) as temp:
         temp.write(data)
         temp.flush()
         with tempfile.NamedTemporaryFile(suffix=".gif") as gif:
+            from moviepy.editor import VideoFileClip
             clip = VideoFileClip(temp.name)
             clip.write_gif(gif.name, logger=None)
             gif.seek(0)
