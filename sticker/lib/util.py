@@ -17,14 +17,50 @@ from functools import partial
 from io import BytesIO
 import os.path
 import json
+import tempfile
+import mimetypes
 
+try:
+    import magic
+except ImportError:
+    print("[Warning] Magic is not installed, using file extensions to guess mime types")
+    magic = None
 from PIL import Image
 
 from . import matrix
 
 open_utf8 = partial(open, encoding='UTF-8')
 
-def convert_image(data: bytes) -> (bytes, int, int):
+
+def guess_mime(data: bytes) -> str:
+    mime = None
+    if magic:
+        try:
+            return magic.Magic(mime=True).from_buffer(data)
+        except Exception:
+            pass
+    else:
+        with tempfile.NamedTemporaryFile(delete=False) as temp:
+            temp.write(data)
+            temp.close()
+            mime, _ = mimetypes.guess_type(temp.name)
+    return mime or "image/png"
+
+
+def video_to_gif(data: bytes, mime: str) -> bytes:
+    from moviepy.editor import VideoFileClip
+    ext = mimetypes.guess_extension(mime)
+    with tempfile.NamedTemporaryFile(suffix=ext) as temp:
+        temp.write(data)
+        temp.flush()
+        with tempfile.NamedTemporaryFile(suffix=".gif") as gif:
+            clip = VideoFileClip(temp.name)
+            clip.write_gif(gif.name, logger=None)
+            gif.seek(0)
+            return gif.read()
+
+
+def _convert_image(data: bytes) -> (bytes, int, int):
     image: Image.Image = Image.open(BytesIO(data)).convert("RGBA")
     new_file = BytesIO()
     image.save(new_file, "png")
@@ -38,6 +74,24 @@ def convert_image(data: bytes) -> (bytes, int, int):
             w = int(w / (h / 256))
             h = 256
     return new_file.getvalue(), w, h
+
+
+def convert_image(data: bytes) -> (bytes, str, int, int):
+    mimetype = guess_mime(data)
+    if mimetype.startswith("video/"):
+        data = video_to_gif(data, mimetype)
+        print(".", end="", flush=True)
+        mimetype = "image/gif"
+    try:
+        rlt = _convert_image(data)
+        return  rlt[0], mimetype, rlt[1], rlt[2]
+    except Exception as e:
+        print(f"Error converting image, mimetype: {mimetype}")
+        ext = mimetypes.guess_extension(mimetype)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp:
+            temp.write(data)
+            print(f"Saved to {temp.name}")
+        raise e
 
 
 def add_to_index(name: str, output_dir: str) -> None:
@@ -57,7 +111,7 @@ def add_to_index(name: str, output_dir: str) -> None:
 
 
 def make_sticker(mxc: str, width: int, height: int, size: int,
-                 body: str = "") -> matrix.StickerInfo:
+                 mimetype: str, body: str = "") -> matrix.StickerInfo:
     return {
         "body": body,
         "url": mxc,
@@ -65,7 +119,7 @@ def make_sticker(mxc: str, width: int, height: int, size: int,
             "w": width,
             "h": height,
             "size": size,
-            "mimetype": "image/png",
+            "mimetype": mimetype,
 
             # Element iOS compatibility hack
             "thumbnail_url": mxc,
@@ -73,7 +127,7 @@ def make_sticker(mxc: str, width: int, height: int, size: int,
                 "w": width,
                 "h": height,
                 "size": size,
-                "mimetype": "image/png",
+                "mimetype": mimetype,
             },
         },
         "msgtype": "m.sticker",
