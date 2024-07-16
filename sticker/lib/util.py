@@ -16,6 +16,7 @@
 from functools import partial
 from io import BytesIO
 import os.path
+import subprocess
 import json
 import tempfile
 import mimetypes
@@ -55,7 +56,6 @@ def video_to_gif(data: bytes, mime: str) -> bytes:
             temp.write(data)
             temp.flush()
             with tempfile.NamedTemporaryFile(suffix=ext) as temp_fixed:
-                import subprocess
                 print(".", end="", flush=True)
                 result = subprocess.run(["ffmpeg", "-y", "-i", temp.name, "-codec", "copy", temp_fixed.name],
                                         capture_output=True)
@@ -72,6 +72,19 @@ def video_to_gif(data: bytes, mime: str) -> bytes:
             clip.write_gif(gif.name, logger=None)
             gif.seek(0)
             return gif.read()
+
+
+def opermize_gif(data: bytes) -> bytes:
+    with tempfile.NamedTemporaryFile() as gif:
+        gif.write(data)
+        gif.flush()
+        # use gifsicle to optimize gif
+        result = subprocess.run(["gifsicle", "--batch", "--optimize=3", "--colors=256", gif.name],
+                                capture_output=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"Run gifsicle failed with code {result.returncode}, Error occurred:\n{result.stderr}")
+        gif.seek(0)
+        return gif.read()
 
 
 def _convert_image(data: bytes, mimetype: str) -> (bytes, int, int):
@@ -140,8 +153,11 @@ def _convert_sticker(data: bytes) -> (bytes, str, int, int):
                     data = gif.read()
                     mimetype = "image/gif"
     rlt = _convert_image(data, mimetype)
-    suffix = mimetypes.guess_extension(mimetype)
-    return  rlt[0], mimetype, rlt[1], rlt[2]
+    data = rlt[0]
+    if mimetype == "image/gif":
+        print(".", end="", flush=True)
+        data = opermize_gif(data)
+    return  data, mimetype, rlt[1], rlt[2]
 
 
 def convert_sticker(data: bytes) -> (bytes, str, int, int):
