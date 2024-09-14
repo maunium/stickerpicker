@@ -4,5 +4,4 @@ pillow
 telethon
 cryptg
 python-magic
-moviepy
 lottie[all]
