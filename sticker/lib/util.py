@@ -27,7 +27,7 @@ try:
 except ImportError:
     print("[Warning] Magic is not installed, using file extensions to guess mime types")
     magic = None
-from PIL import Image, ImageSequence
+from PIL import Image, ImageSequence, ImageFilter
 
 from . import matrix
 
@@ -93,6 +93,32 @@ def video_to_webp(data: bytes) -> bytes:
     return _video_to_webp(data)
 
 
+def process_frame(frame):
+    """
+    Process GIF frame, repair edges, ensure no white or semi-transparent pixels, while keeping color information intact.
+    """
+    frame = frame.convert('RGBA')
+
+    # Decompose Alpha channel
+    alpha = frame.getchannel('A')
+
+    # Process Alpha channel with threshold, remove semi-transparent pixels
+    # Threshold can be adjusted as needed (0-255), 128 is the middle value
+    threshold = 128
+    alpha = alpha.point(lambda x: 255 if x >= threshold else 0)
+
+    # Process Alpha channel with MinFilter, remove edge noise
+    alpha = alpha.filter(ImageFilter.MinFilter(3))
+
+    # Process Alpha channel with MaxFilter, repair edges
+    alpha = alpha.filter(ImageFilter.MaxFilter(3))
+
+    # Apply processed Alpha channel back to image
+    frame.putalpha(alpha)
+
+    return frame
+
+
 def webp_to_others(data: bytes, mimetype: str) -> bytes:
     with tempfile.NamedTemporaryFile(suffix=".webp") as webp:
         webp.write(data)
@@ -102,7 +128,21 @@ def webp_to_others(data: bytes, mimetype: str) -> bytes:
             print(".", end="", flush=True)
             im = Image.open(webp.name)
             im.info.pop('background', None)
-            im.save(img.name, save_all=True, lossless=True, quality=100, method=6)
+
+            if mimetype == "image/gif":
+                frames = []
+                duration = []
+
+                for frame in ImageSequence.Iterator(im):
+                    frame = process_frame(frame)
+                    frames.append(frame)
+                    duration.append(frame.info.get('duration', 100))
+
+                frames[0].save(img.name, save_all=True, lossless=True, quality=100, method=6,
+                               append_images=frames[1:], loop=0, duration=duration, disposal=2)
+            else:
+                im.save(img.name, save_all=True, lossless=True, quality=100, method=6)
+
             img.seek(0)
             return img.read()
 
@@ -126,7 +166,7 @@ def webp_to_gif_or_png(data: bytes) -> bytes:
     # check if the webp is animated
     image: Image.Image = Image.open(BytesIO(data))
     is_animated = getattr(image, "is_animated", False)
-    if is_animated and is_uniform_animated_webp(data):
+    if is_animated and not is_uniform_animated_webp(data):
         return webp_to_others(data, "image/gif")
     else:
         # convert to png
