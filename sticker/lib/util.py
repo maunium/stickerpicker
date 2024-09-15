@@ -148,29 +148,30 @@ def webp_to_others(data: bytes, mimetype: str) -> bytes:
 
 
 def is_uniform_animated_webp(data: bytes) -> bool:
-    img = Image.open(BytesIO(data))
-    if img.n_frames <= 1:
-        return False
+    with Image.open(BytesIO(data)) as img:
+        if img.n_frames <= 1:
+            return True
 
-    first_frame = np.array(img)
-    for frame_number in range(1, img.n_frames):
-        img.seek(frame_number)
-        current_frame = np.array(img)
-        if not np.array_equal(first_frame, current_frame):
-            return False
+        img_iter = ImageSequence.Iterator(img)
+        first_frame = np.array(img_iter[0].convert("RGBA"))
+
+        for frame in img_iter:
+            current_frame = np.array(frame.convert("RGBA"))
+            if not np.array_equal(first_frame, current_frame):
+                return False
 
     return True
 
 
 def webp_to_gif_or_png(data: bytes) -> bytes:
-    # check if the webp is animated
-    image: Image.Image = Image.open(BytesIO(data))
-    is_animated = getattr(image, "is_animated", False)
-    if is_animated and not is_uniform_animated_webp(data):
-        return webp_to_others(data, "image/gif")
-    else:
-        # convert to png
-        return webp_to_others(data, "image/png")
+    with Image.open(BytesIO(data)) as image:
+        # check if the webp is animated
+        is_animated = getattr(image, "is_animated", False)
+        if is_animated and not is_uniform_animated_webp(data):
+            return webp_to_others(data, "image/gif")
+        else:
+            # convert to png
+            return webp_to_others(data, "image/png")
 
 
 def opermize_gif(data: bytes) -> bytes:
@@ -187,40 +188,40 @@ def opermize_gif(data: bytes) -> bytes:
 
 
 def _convert_image(data: bytes, mimetype: str) -> (bytes, int, int):
-    image: Image.Image = Image.open(BytesIO(data))
-    new_file = BytesIO()
-    # Determine if the image is a GIF
-    is_animated = getattr(image, "is_animated", False)
-    if is_animated:
-        frames = [frame.convert("RGBA") for frame in ImageSequence.Iterator(image)]
-        # Save the new GIF
-        frames[0].save(
-            new_file,
-            format='GIF',
-            save_all=True,
-            append_images=frames[1:],
-            loop=image.info.get('loop', 0),  # Default loop to 0 if not present
-            duration=image.info.get('duration', 100),  # Set a default duration if not present
-            disposal=image.info.get('disposal', 2)  # Default to disposal method 2 (restore to background)
-        )
-        # Get the size of the first frame to determine resizing
-        w, h = frames[0].size
-    else:
-        suffix = mimetypes.guess_extension(mimetype)
-        if suffix:
-            suffix = suffix[1:]
-        image = image.convert("RGBA")
-        image.save(new_file, format=suffix)
-        w, h = image.size
-    if w > 256 or h > 256:
-        # Set the width and height to lower values so clients wouldn't show them as huge images
-        if w > h:
-            h = int(h / (w / 256))
-            w = 256
-        else:
-            w = int(w / (h / 256))
-            h = 256
-    return new_file.getvalue(), w, h
+    with Image.open(BytesIO(data)) as image:
+        with BytesIO() as new_file:
+            # Determine if the image is a GIF
+            is_animated = getattr(image, "is_animated", False)
+            if is_animated:
+                frames = [frame.convert("RGBA") for frame in ImageSequence.Iterator(image)]
+                # Save the new GIF
+                frames[0].save(
+                    new_file,
+                    format='GIF',
+                    save_all=True,
+                    append_images=frames[1:],
+                    loop=image.info.get('loop', 0),  # Default loop to 0 if not present
+                    duration=image.info.get('duration', 100),  # Set a default duration if not present
+                    disposal=image.info.get('disposal', 2)  # Default to disposal method 2 (restore to background)
+                )
+                # Get the size of the first frame to determine resizing
+                w, h = frames[0].size
+            else:
+                suffix = mimetypes.guess_extension(mimetype)
+                if suffix:
+                    suffix = suffix[1:]
+                image = image.convert("RGBA")
+                image.save(new_file, format=suffix)
+                w, h = image.size
+            if w > 256 or h > 256:
+                # Set the width and height to lower values so clients wouldn't show them as huge images
+                if w > h:
+                    h = int(h / (w / 256))
+                    w = 256
+                else:
+                    w = int(w / (h / 256))
+                    h = 256
+            return new_file.getvalue(), w, h
 
 
 def _convert_sticker(data: bytes) -> (bytes, str, int, int):
