@@ -120,28 +120,26 @@ def process_frame(frame):
 
 
 def webp_to_others(data: bytes, mimetype: str) -> bytes:
-    with tempfile.NamedTemporaryFile(suffix=".webp") as webp:
-        webp.write(data)
-        webp.flush()
-        ext = mimetypes.guess_extension(mimetype)
-        with tempfile.NamedTemporaryFile(suffix=ext) as img:
+    format = mimetypes.guess_extension(mimetype)[1:]
+    print(format)
+    with Image.open(BytesIO(data)) as webp:
+        with BytesIO() as img:
             print(".", end="", flush=True)
-            im = Image.open(webp.name)
-            im.info.pop('background', None)
+            webp.info.pop('background', None)
 
             if mimetype == "image/gif":
                 frames = []
-                duration = []
+                duration = [100, ]
 
-                for frame in ImageSequence.Iterator(im):
+                for frame in ImageSequence.Iterator(webp):
                     frame = process_frame(frame)
                     frames.append(frame)
-                    duration.append(frame.info.get('duration', 100))
+                    duration.append(frame.info.get('duration', duration[-1]))
 
-                frames[0].save(img.name, save_all=True, lossless=True, quality=100, method=6,
-                               append_images=frames[1:], loop=0, duration=duration, disposal=2)
+                frames[0].save(img, format=format, save_all=True, lossless=True, quality=100, method=6,
+                               append_images=frames[1:], loop=0, duration=duration[1:], disposal=2)
             else:
-                im.save(img.name, save_all=True, lossless=True, quality=100, method=6)
+                webp.save(img, format=format, lossless=True, quality=100, method=6)
 
             img.seek(0)
             return img.read()
