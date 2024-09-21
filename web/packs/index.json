@@ -1,0 +1,18 @@
+{
+  "packs": [
+    "CP_Extended.json",
+    "AphTwin.json",
+    "Mari4ka_UHP.json",
+    "Schizopack.json",
+    "JahySamaWaKujikenai.json",
+    "Blyat_Valhalla.json",
+    "julielya.json",
+    "Sad_Kyaru_chan.json",
+    "Bikaloh.json",
+    "monogatariseries.json",
+    "VA11_HALLA.json",
+    "va11halla.json",
+    "Satangirl.json"
+  ],
+  "homeserver_url": "https://tchncs.de/"
+}
