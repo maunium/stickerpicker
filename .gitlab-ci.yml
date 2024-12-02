@@ -1,3 +1,6 @@
+variables:
+  GOTOOLCHAIN: local
+
 build giphy proxy docker:
   image: docker:stable
   stage: build
