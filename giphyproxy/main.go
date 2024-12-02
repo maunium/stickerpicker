@@ -60,7 +60,7 @@ func main() {
 	}
 }
 
-func getMedia(_ context.Context, id string) (response mediaproxy.GetMediaResponse, err error) {
+func getMedia(_ context.Context, id string, _ map[string]string) (response mediaproxy.GetMediaResponse, err error) {
 	// This is not related to giphy, but random cats are always fun
 	if id == "cat" {
 		return &mediaproxy.GetMediaResponseURL{
