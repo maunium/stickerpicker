@@ -15,3 +15,6 @@ server_key: CHANGE ME
 hostname: 0.0.0.0
 # Port where the proxy should listen on
 port: 8008
+
+# Redirect destination. This can be changed to serve a different format.
+destination: https://i.giphy.com/%s.webp

@@ -33,12 +33,14 @@ import (
 type Config struct {
 	mediaproxy.BasicConfig  `yaml:",inline"`
 	mediaproxy.ServerConfig `yaml:",inline"`
+	Destination string `yaml:"destination"
 }
 
 var configPath = flag.String("config", "config.yaml", "config file path")
 var generateServerKey = flag.Bool("generate-key", false, "generate a new server key and exit")
 
 var giphyIDRegex = regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)
+var destination = "https://i.giphy.com/%s.webp"
 
 func main() {
 	flag.Parse()
@@ -51,6 +53,9 @@ func main() {
 		mp := exerrors.Must(mediaproxy.NewFromConfig(cfg.BasicConfig, getMedia))
 		mp.KeyServer.Version.Name = "maunium-stickerpicker giphy proxy"
 		mp.ForceProxyLegacyFederation = true
+		if cfg.Destination != "" {
+			destination = cfg.Destination
+		}
 		exerrors.PanicIfNotNil(mp.Listen(cfg.ServerConfig))
 	}
 }
@@ -67,6 +72,6 @@ func getMedia(_ context.Context, id string) (response mediaproxy.GetMediaRespons
 		return nil, mediaproxy.ErrInvalidMediaIDSyntax
 	}
 	return &mediaproxy.GetMediaResponseURL{
-		URL: fmt.Sprintf("https://i.giphy.com/%s.webp", id),
+		URL: fmt.Sprintf(destination, id),
 	}, nil
 }
