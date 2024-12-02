@@ -33,7 +33,7 @@ import (
 type Config struct {
 	mediaproxy.BasicConfig  `yaml:",inline"`
 	mediaproxy.ServerConfig `yaml:",inline"`
-	Destination string `yaml:"destination"
+	Destination             string `yaml:"destination"`
 }
 
 var configPath = flag.String("config", "config.yaml", "config file path")
