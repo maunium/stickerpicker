@@ -4,3 +4,4 @@ pillow
 telethon
 cryptg
 python-magic
+lottie[all]
