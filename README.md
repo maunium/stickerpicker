@@ -15,7 +15,13 @@ Now you can put the stickers in a pack in the packs directory. You can either us
 Then to install the pack run the following command:
 
 ```bash
-sticker-pack <pack directory> --add-to-index web/packs/
+sticker-pack packs/<pack directory> --add-to-index web/packs/
+```
+
+For example:
+
+```bash
+sticker-pack packs/Hackerspace --add-to-index web/packs/
 ```
 
 When you push the repo the pack will be deployed to be used by the Hackerspace Matrix.
