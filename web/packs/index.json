@@ -1,0 +1,6 @@
+{
+  "packs": [
+    "hackerspace.json"
+  ],
+  "homeserver_url": "https://matrix.hackerspace-ntnu.no"
+}
