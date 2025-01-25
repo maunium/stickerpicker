@@ -10,7 +10,7 @@ First make sure you have python 3.6 or later installed. Then run the following c
 pip install .
 ```
 
-Now you can put the stickers in a pack in the packs directory. You can either use the hackerspace pack or create your own. Remember to add the number of the sticker in the starts of the file name. It should look liks this `01-name.png`. You can use either png, jpg or gif files.
+Now you can put the stickers in a pack in the packs directory. You can either use the hackerspace pack or create your own. Remember to add the number of the sticker in the starts of the file name. It should look liks this `01-name.png`. You can use either png or jpg files.
 
 Then to install the pack run the following command:
 
@@ -21,7 +21,7 @@ sticker-pack packs/<pack directory> --add-to-index web/packs/
 For example:
 
 ```bash
-sticker-pack packs/Hackerspace --add-to-index web/packs/
+sticker-pack packs/hackerspace --add-to-index web/packs/
 ```
 
 When you push the repo the pack will be deployed to be used by the Hackerspace Matrix.
