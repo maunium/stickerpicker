@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from pathlib import Path
 from typing import Dict, Optional
 from hashlib import sha256
 import mimetypes
@@ -107,9 +108,11 @@ async def main(args: argparse.Namespace) -> None:
         old_stickers = {sticker["id"]: sticker for sticker in pack["stickers"]}
         pack["stickers"] = []
 
+    stickers_data: Dict[str, bytes] = {}
     for file in sorted(os.listdir(args.path)):
         sticker = await upload_sticker(file, args.path, old_stickers=old_stickers)
         if sticker:
+            stickers_data[sticker["url"]]  = Path(args.path, file).read_bytes()
             pack["stickers"].append(sticker)
 
     with util.open_utf8(meta_path, "w") as pack_file:
@@ -122,6 +125,8 @@ async def main(args: argparse.Namespace) -> None:
         with util.open_utf8(picker_pack_path, "w") as pack_file:
             json.dump(pack, pack_file)
         print(f"Copied pack to {picker_pack_path}")
+
+        util.add_thumbnails(pack["stickers"], stickers_data, args.add_to_index)
         util.add_to_index(picker_file_name, args.add_to_index)
 
 

@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Dict
+from typing import Dict, Tuple
 import argparse
 import asyncio
 import os.path
@@ -29,7 +29,7 @@ from telethon.tl.types.messages import StickerSet as StickerSetFull
 from .lib import matrix, util
 
 
-async def reupload_document(client: TelegramClient, document: Document) -> matrix.StickerInfo:
+async def reupload_document(client: TelegramClient, document: Document) -> Tuple[matrix.StickerInfo, bytes]:
     print(f"Reuploading {document.id}", end="", flush=True)
     data = await client.download_media(document, file=bytes)
     print(".", end="", flush=True)
@@ -37,7 +37,7 @@ async def reupload_document(client: TelegramClient, document: Document) -> matri
     print(".", end="", flush=True)
     mxc = await matrix.upload(data, "image/png", f"{document.id}.png")
     print(".", flush=True)
-    return util.make_sticker(mxc, width, height, len(data))
+    return util.make_sticker(mxc, width, height, len(data)), data
 
 
 def add_meta(document: Document, info: matrix.StickerInfo, pack: StickerSetFull) -> None:
@@ -75,15 +75,17 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
     except FileNotFoundError:
         pass
 
+    stickers_data: Dict[str, bytes] = {}
     reuploaded_documents: Dict[int, matrix.StickerInfo] = {}
     for document in pack.documents:
         try:
             reuploaded_documents[document.id] = already_uploaded[document.id]
             print(f"Skipped reuploading {document.id}")
         except KeyError:
-            reuploaded_documents[document.id] = await reupload_document(client, document)
+            reuploaded_documents[document.id], data = await reupload_document(client, document)
         # Always ensure the body and telegram metadata is correct
         add_meta(document, reuploaded_documents[document.id], pack)
+        stickers_data[reuploaded_documents[document.id]["url"]] = data
 
     for sticker in pack.packs:
         if not sticker.emoticon:
@@ -107,6 +109,7 @@ async def reupload_pack(client: TelegramClient, pack: StickerSetFull, output_dir
         }, pack_file, ensure_ascii=False)
     print(f"Saved {pack.set.title} as {pack.set.short_name}.json")
 
+    util.add_thumbnails(list(reuploaded_documents.values()), stickers_data, output_dir)
     util.add_to_index(os.path.basename(pack_path), output_dir)
 
 
