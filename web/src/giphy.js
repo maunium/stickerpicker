@@ -1,5 +1,6 @@
 import {Component, html} from "../lib/htm/preact.js";
 import * as widgetAPI from "./widget-api.js";
+import {Spinner} from "./spinner.js";
 import {SearchBox} from "./search-box.js";
 
 const GIPHY_SEARCH_DEBOUNCE = 1000
@@ -24,6 +25,7 @@ export class GiphySearchTab extends Component {
 			searchTerm: "",
 			gifs: [],
 			loading: false,
+			debouncing: false,
 			error: null,
 		}
 		this.handleGifClick = this.handleGifClick.bind(this)
@@ -34,13 +36,14 @@ export class GiphySearchTab extends Component {
 
 	async makeGifSearchRequest() {
 		try {
-			const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
-			// TODO handle error responses properly?
-			const data = await resp.json()
-			if (data.data.length === 0) {
-				this.setState({gifs: [], error: "No results"})
-			} else {
-				this.setState({gifs: data.data, error: null})
+			this.setState({gifs: [], debouncing: false, loading: true})
+			try {
+				const resp = await fetch(`https://api.giphy.com/v1/gifs/search?q=${this.state.searchTerm}&api_key=${GIPHY_API_KEY}`)
+				const { data: gifs, meta } = await resp.json()
+				const error = meta.msg !== 'OK' ? `An issue happened, please try again (${meta.msg})` : null
+				this.setState({gifs, error, loading: false})
+			} catch (e) {
+				this.setState({gifs: [], error: `An issue happened, please try again (${e.message})`, loading: false})
 			}
 		} catch (error) {
 			this.setState({error})
@@ -59,7 +62,7 @@ export class GiphySearchTab extends Component {
 	}
 
 	updateGifSearchQuery(event) {
-		this.setState({searchTerm: event.target.value})
+		this.setState({searchTerm: event.target.value, debouncing: true})
 		clearTimeout(this.searchTimeout)
 		this.searchTimeout = setTimeout(() => this.makeGifSearchRequest(), GIPHY_SEARCH_DEBOUNCE)
 	}
@@ -82,24 +85,36 @@ export class GiphySearchTab extends Component {
 	}
 
 	render() {
-		// TODO display loading state?
 		return html`
-			<${SearchBox} onInput=${this.updateGifSearchQuery} onKeyUp=${this.searchKeyUp} value=${this.state.searchTerm} placeholder="Find GIFs"/>
+			<${SearchBox}
+				onInput=${this.updateGifSearchQuery}
+				onKeyUp=${this.searchKeyUp}
+				value=${this.state.searchTerm}
+				loading=${this.state.debouncing}
+				placeholder="Find GIFs"
+			/>
 			<div class="pack-list">
 				<section class="stickerpack" id="pack-giphy">
-					<div class="error">
-						${this.state.error}
-					</div>
-					<div class="sticker-list">
-						${this.state.gifs.map((gif) => html`
-							<div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
-								<img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
+					${this.state.loading ?
+						html`<${Spinner} size=${80} green/>` :
+						html`
+							<div class="search-error">
+								${this.state.error}
 							</div>
-						`)}
-					</div>
-					<div class="footer powered-by-giphy">
-						<img src="./res/powered-by-giphy.png" alt="Powered by GIPHY"/>
-					</div>
+							${this.state.searchTerm && this.state.gifs.length === 0 && !this.state.error && !this.state.loading
+								? html`<div class="search-empty">No GIFs match your search</div>`
+								: null}
+							<div class="sticker-list">
+								${this.state.gifs.map((gif) => html`
+									<div class="sticker" onClick=${() => this.handleGifClick(gif)} data-gif-id=${gif.id}>
+										<img src=${gif.images.fixed_height.url} alt=${gif.title} class="visible" data=/>
+									</div>
+								`)}
+							</div>
+							<div class="footer powered-by-giphy">
+								<img src="./res/powered-by-giphy.png" alt="Powered by GIPHY"/>
+							</div>
+					`}
 				</section>
 			</div>
 		`
