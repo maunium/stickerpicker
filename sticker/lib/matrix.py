@@ -59,7 +59,7 @@ async def load_config(path: str) -> None:
         print("Matrix config file not found. Please enter your homeserver and access token.")
         homeserver_url = input("Homeserver URL: ")
         access_token = input("Access token: ")
-        whoami_url = URL(homeserver_url) / "_matrix" / "client" / "r0" / "account" / "whoami"
+        whoami_url = URL(homeserver_url) / "_matrix" / "client" / "v3" / "account" / "whoami"
         if whoami_url.scheme not in ("https", "http"):
             whoami_url = whoami_url.with_scheme("https")
         user_id = await whoami(whoami_url, access_token)
@@ -71,7 +71,7 @@ async def load_config(path: str) -> None:
             }, config_file)
         print(f"Wrote config to {path}")
 
-    upload_url = URL(homeserver_url) / "_matrix" / "media" / "r0" / "upload"
+    upload_url = URL(homeserver_url) / "_matrix" / "media" / "v3" / "upload"
 
 
 async def whoami(url: URL, access_token: str) -> str:

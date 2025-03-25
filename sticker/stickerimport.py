@@ -161,7 +161,7 @@ async def main(args: argparse.Namespace) -> None:
 
 
 def cmd() -> None:
-    asyncio.get_event_loop().run_until_complete(main(parser.parse_args()))
+    asyncio.run(main(parser.parse_args()))
 
 
 if __name__ == "__main__":

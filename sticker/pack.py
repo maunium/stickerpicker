@@ -143,7 +143,7 @@ parser.add_argument("path", help="Path to the sticker pack directory", type=str)
 
 
 def cmd():
-    asyncio.get_event_loop().run_until_complete(main(parser.parse_args()))
+    asyncio.run(main(parser.parse_args()))
 
 
 if __name__ == "__main__":
