@@ -29,10 +29,8 @@ const params = new URLSearchParams(document.location.search)
 if (params.has('config')) {
 	INDEX = params.get("config")
 }
-// This is updated from packs/index.json
-let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
-const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/v3/thumbnail/${mxc.slice(6)}?height=128&width=128&method=scale`
+const makeThumbnailURL = mxc => `${PACKS_BASE_URL}/thumbnails/${mxc.split("/").slice(-1)[0]}`
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
 // This is also used to fix scrolling to sections on Element iOS
@@ -165,7 +163,6 @@ class App extends Component {
 				return
 			}
 			const indexData = await indexRes.json()
-			HOMESERVER_URL = indexData.homeserver_url || HOMESERVER_URL
 			if (indexData.giphy_api_key !== undefined) {
 				setGiphyAPIKey(indexData.giphy_api_key, indexData.giphy_mxc_prefix)
 			}
