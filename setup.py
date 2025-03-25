@@ -50,5 +50,6 @@ setuptools.setup(
     entry_points={"console_scripts": [
         "sticker-import=sticker.stickerimport:cmd",
         "sticker-pack=sticker.pack:cmd",
+        "sticker-download-thumbnails=sticker.download_thumbnails:cmd",
     ]},
 )
