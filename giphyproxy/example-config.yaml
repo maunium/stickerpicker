@@ -4,12 +4,13 @@
 server_name: giphy.example.com
 # Optionally a custom .well-known response. This defaults to `server_name:443` if empty.
 well_known_response:
-# The proxy will use MSC3860/MSC3916 media download redirects if the requester supports it.
-# Optionally, you can force redirects and not allow proxying at all by setting this to false.
-allow_proxy: false
 # Matrix server signing key to make the federation tester pass, same format as synapse's .signing.key file.
 # You can generate one using `giphyproxy -generate-key`.
 server_key: CHANGE ME
+# Should federation authentication be enforced?
+# If true, requests to the /_matrix/federation/v1/media/download/... endpoint
+# will check the Authorization: X-Matrix header before redirecting.
+federation_auth: false
 
 # Hostname where the proxy should listen on
 hostname: 0.0.0.0
