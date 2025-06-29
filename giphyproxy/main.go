@@ -51,7 +51,7 @@ func main() {
 		var cfg Config
 		exerrors.PanicIfNotNil(yaml.Unmarshal(cfgFile, &cfg))
 		mp := exerrors.Must(mediaproxy.NewFromConfig(cfg.BasicConfig, getMedia))
-		mp.KeyServer.Version.Name = "maunium-stickerpicker giphy proxy"
+		mp.KeyServer.Version.Name = "mautrix-go + maunium-stickerpicker giphy proxy"
 		mp.ForceProxyLegacyFederation = true
 		if cfg.Destination != "" {
 			destination = cfg.Destination

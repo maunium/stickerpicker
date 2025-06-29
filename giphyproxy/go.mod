@@ -2,12 +2,12 @@ module go.mau.fi/stickerpicker/giphyproxy
 
 go 1.23.0
 
-toolchain go1.24.2
+toolchain go1.24.4
 
 require (
-	go.mau.fi/util v0.8.7-0.20250427215252-d2d18a7e463c
+	go.mau.fi/util v0.8.8
 	gopkg.in/yaml.v3 v3.0.1
-	maunium.net/go/mautrix v0.23.4-0.20250503221444-5cd8ba888775
+	maunium.net/go/mautrix v0.24.2-0.20250629161127-7a7d7f70ef92
 )
 
 require (
@@ -20,7 +20,9 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476 // indirect
+	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
 )
