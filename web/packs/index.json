@@ -1,7 +1,8 @@
 {
   "packs": [
     "hackerspace.json",
-    "pusheen.json"
+    "pusheen.json",
+    "gifs.json"
   ],
   "homeserver_url": "https://matrix.hackerspace-ntnu.no"
 }
