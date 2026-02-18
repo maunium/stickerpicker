@@ -2,7 +2,7 @@ variables:
   GOTOOLCHAIN: local
 
 build giphy proxy docker:
-  image: docker:stable
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
   stage: build
   before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
