@@ -14,12 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import {html} from "../lib/htm/preact.js"
+import {Spinner} from "./spinner.js";
 
-export const SearchBox = ({onInput, onKeyUp, value, placeholder = 'Find stickers'}) => {
+export const SearchBox = ({onInput, onKeyUp, value, loading = false, placeholder = 'Find stickers'}) => {
 	const component = html`
 		<div class="search-box">
 			<input type="text" placeholder=${placeholder} value=${value} onInput=${onInput} onKeyUp=${onKeyUp}/>
-			<span class="icon icon-search"/>
+			${!loading ?
+				html`<span class="icon icon-search"/>` :
+				html`<div class="search-spinner"><${Spinner} size=${14}/></div>`}
 		</div>
 	`
 	return component
