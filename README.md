@@ -21,12 +21,12 @@ If you prefer video tutorials, [Brodie Robertson](https://www.youtube.com/c/Brod
 
 | Feature                         | Scalar | Dimension | Maunium sticker picker |
 |---------------------------------|--------|-----------|------------------------|
-| Free software                   | ❌     | ✔️        | ✔️                     |
-| Custom sticker packs            | ❌     | ✔️        | ✔️                     |
-| Telegram import                 | ❌     | ✔️        | ✔️                     |
-| Works on Element mobiles        | ✔️     | ❌        | ✔️                     |
-| Easy multi-user setup           | ✔️     | ✔️        | ❌<sup>[#7][#7]</sup>  |
-| Frequently used stickers at top | ❌     | ❌        | ✔️                     |
+| Free software                   | ❌     | ✅        | ✅                     |
+| Custom sticker packs            | ❌     | ✅        | ✅                     |
+| Telegram import                 | ❌     | ✅        | ✅                     |
+| Works on Element mobiles        | ✅     | ❌        | ✅                     |
+| Easy multi-user setup           | ✅     | ✅        | ❌<sup>[#7][#7]</sup>  |
+| Frequently used stickers at top | ❌     | ❌        | ✅                     |
 
 [#7]: https://github.com/maunium/stickerpicker/issues/7
 
