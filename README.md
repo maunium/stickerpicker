@@ -1,26 +1,29 @@
 # Maunium sticker picker
+
 A fast and simple Matrix sticker picker widget. Tested on Element Web, Android & iOS.
 
 ## Discussion
+
 Matrix room: [`#stickerpicker:maunium.net`](https://matrix.to/#/#stickerpicker:maunium.net)
 
 ## Instructions
+
 For setup and usage instructions, please visit the [wiki](https://github.com/maunium/stickerpicker/wiki):
 
-* [Creating packs](https://github.com/maunium/stickerpicker/wiki/Creating-packs)
-* [Enabling the widget](https://github.com/maunium/stickerpicker/wiki/Enabling-the-widget)
-* [Hosting on GitHub pages](https://github.com/maunium/stickerpicker/wiki/Hosting-on-GitHub-pages)
+- [Creating packs](https://github.com/maunium/stickerpicker/wiki/Creating-packs)
+- [Enabling the widget](https://github.com/maunium/stickerpicker/wiki/Enabling-the-widget)
+- [Hosting on GitHub pages](https://github.com/maunium/stickerpicker/wiki/Hosting-on-GitHub-pages)
 
 If you prefer video tutorials, [Brodie Robertson](https://www.youtube.com/c/BrodieRobertson) has made a great video on setting up the picker and creating some packs: https://youtu.be/Yz3H6KJTEI0.
 
 ## Comparison with other sticker pickers
 
-* Scalar is the default integration manager in Element, which can't be self-hosted and only supports predefined sticker packs.
-* [Dimension](https://github.com/turt2live/matrix-dimension) is an alternate integration manager. It can be self-hosted, but it's more difficult than Maunium sticker picker.
-* Maunium sticker picker is just a sticker picker rather than a full integration manager. It's much simpler than integration managers, but currently has to be set up manually per-user.
+- Scalar is the default integration manager in Element, which can't be self-hosted and only supports predefined sticker packs.
+- [Dimension](https://github.com/turt2live/matrix-dimension) is an alternate integration manager. It can be self-hosted, but it's more difficult than Maunium sticker picker.
+- Maunium sticker picker is just a sticker picker rather than a full integration manager. It's much simpler than integration managers, but currently has to be set up manually per-user.
 
 | Feature                         | Scalar | Dimension | Maunium sticker picker |
-|---------------------------------|--------|-----------|------------------------|
+| ------------------------------- | ------ | --------- | ---------------------- |
 | Free software                   | ❌     | ✔️        | ✔️                     |
 | Custom sticker packs            | ❌     | ✔️        | ✔️                     |
 | Telegram import                 | ❌     | ✔️        | ✔️                     |
@@ -31,11 +34,18 @@ If you prefer video tutorials, [Brodie Robertson](https://www.youtube.com/c/Brod
 [#7]: https://github.com/maunium/stickerpicker/issues/7
 
 ## Preview
-### Element Web
-![Element Web](preview-element-web.png)
 
-### Element Android
-![Element Android](preview-element-android.png)
+| Web / Desktop                                  | Android                                                | iOS (Dark theme)                               |
+| ---------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| ![Element Web](images/preview-element-web.png) | ![Element Android](images/preview-element-android.png) | ![Element iOS](images/preview-element-ios.png) |
 
-### Element iOS (dark theme)
-![Element iOS](preview-element-ios.png)
+## Additional configuration
+
+On an hosted instance of the sticker picker, it is possible to provide optional URL params for extended configuration :
+
+- `?config=<link to an index.json file>`
+  - allows to use an external `index.json` file (see [packs/README.md](packs/README.md))
+  - this overrides the `web/packs/index.json` file
+- `?theme=[$theme|default|light|black|dark]`
+  - provides the theme to use for the sticker picker
+  - `$theme` matches the theme of your Element client
