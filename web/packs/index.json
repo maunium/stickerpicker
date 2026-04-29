@@ -1,6 +1,7 @@
 {
   "packs": [
-    "emotes.json"
+    "emotes.json",
+    "boykisser.json"
   ],
   "homeserver_url": "https://matrix.picat.net"
 }
