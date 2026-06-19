@@ -141,9 +141,14 @@ div.pack-list.ios-safari-hack
   right: 0
   -webkit-overflow-scrolling: touch
 
+div.search-error,
 div.search-empty
   margin: 1.2rem
   text-align: center
+  font-weight: bold
+
+div.search-error
+  color: #c43e3e
 
 section.stickerpack
   margin-top: .75rem
@@ -203,6 +208,7 @@ div.search-box
     font-size: 1rem
     color: var(--text-color)
 
+  >.search-spinner,
   >span.icon
     display: flex
     position: absolute
